@@ -11,29 +11,23 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.anurag.eduai.ui.navigation.LoginNavigator
+import com.anurag.eduai.ui.theme.AdaptiveTheme
 import com.anurag.eduai.ui.theme.EduAITheme
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            EduAITheme {
-                Scaffold( modifier = Modifier.fillMaxSize() ) { innerPadding ->
-                    Greeting(
-                        name = "EduAI",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+            AdaptiveTheme {
+                EduAITheme {
+                    Scaffold( modifier = Modifier.fillMaxSize() ) { innerPadding ->
+                        LoginNavigator()
+                    }
                 }
             }
         }
     }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = name,
-        modifier = modifier
-    )
 }
