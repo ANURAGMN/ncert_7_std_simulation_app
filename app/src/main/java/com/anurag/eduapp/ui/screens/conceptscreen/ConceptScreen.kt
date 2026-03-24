@@ -118,14 +118,22 @@ fun ConceptScreen(
                 )
 
                 Spacer(modifier = Modifier.height(dimens.spaceSmall))
+
+                // Filter concepts that have a valid simulation URL
+                val filteredConcepts = state.concepts.filter { concept ->
+                    (!concept.simulationUrl.isNullOrBlank() && concept.simulationUrl != "Not found") ||
+                    (!concept.simulationUrlKannada.isNullOrBlank() && concept.simulationUrlKannada != "Not found")
+                }
+
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(dimens.spaceSmall),
                 ) {
-                    items(count = state.concepts.size, key = { state.concepts[it].id }) { index ->
-                        val conceptUiModel = state.concepts[index]
+                    items(count = filteredConcepts.size, key = { filteredConcepts[it].id }) { index ->
+                        val conceptUiModel = filteredConcepts[index]
                         ConceptCard(
                             concept = conceptUiModel,
+                            serialNumber = index + 1,
                             onClick = {
                             },
                             onSimulationClick = { title, url ->

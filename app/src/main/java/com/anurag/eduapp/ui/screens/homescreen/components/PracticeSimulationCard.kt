@@ -55,7 +55,17 @@ fun PracticeSimulationCard(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(dimes.spaceSmall)
             ) {
-                progressSimulations.forEach { (progress, concept) ->
+                // Filter concepts that have valid simulation URLs
+                val filteredSimulations = progressSimulations.mapIndexed { _, (progress, concept) ->
+                    Pair(progress, concept)
+                }.filter { (_, concept) ->
+                    concept?.let { sim ->
+                        (!sim.simulationUrl.isNullOrBlank() && sim.simulationUrl != "Not found") ||
+                        (!sim.simulationUrlKannada.isNullOrBlank() && sim.simulationUrlKannada != "Not found")
+                    } ?: false
+                }
+
+                filteredSimulations.forEachIndexed { index, (progress, concept) ->
                     concept?.let { sim ->
                         val conceptUiModel = ConceptUiModel(
                             id = sim.conceptId,
@@ -74,6 +84,7 @@ fun PracticeSimulationCard(
 
                         ConceptCard(
                             concept = conceptUiModel,
+                            serialNumber = index + 1,
                             onSimulationClick = { title, url ->
                                 // Clicking "Simulation" button opens URL viewer
                                 onSimulationUrlClick(title, url)

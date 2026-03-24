@@ -47,6 +47,7 @@ import com.anurag.eduapp.ui.theme.White
 @Composable
 fun ConceptCard(
     concept: ConceptUiModel,
+    serialNumber: Int = 1,
     onClick: () -> Unit = {},
     onSimulationClick: (String,String) -> Unit = { _,_ -> }
 ) {
@@ -73,7 +74,7 @@ fun ConceptCard(
         ) {
             // Status badge (Circle with icon/order)
             ConceptStatusBadge(
-                conceptOrder = concept.order.toString(),
+                conceptOrder = serialNumber.toString(),
                 status = concept.status
             )
 
