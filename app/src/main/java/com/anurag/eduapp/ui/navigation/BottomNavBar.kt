@@ -38,7 +38,7 @@ fun BottomNavBar(onLogout: () -> Unit = {}) {
     val currentRoute = currentBackStackEntry.value?.destination?.route
 
     val showBottomBar =
-        currentRoute == BottomNavItem.Home.route || currentRoute == BottomNavItem.Progress.route || currentRoute == BottomNavItem.Setting.route
+        currentRoute == BottomNavItem.Home.route || currentRoute == BottomNavItem.Progress.route || currentRoute == BottomNavItem.Setting.route || currentRoute == "subjects"
 
     Scaffold(
         bottomBar = {
@@ -86,7 +86,7 @@ fun BottomNavBar(onLogout: () -> Unit = {}) {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = BottomNavItem.Home.route,
+            startDestination = "subjects",
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(BottomNavItem.Home.route) {
