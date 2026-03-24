@@ -19,3 +19,23 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-keep class com.anurag.eduapp.data.firebase.** { *; }
+-keep class com.anurag.eduapp.data.model.** { *; }
+
+-keep,includedescriptorclasses class com.anurag.eduapp.**$$serializer { *; }
+-keepclassmembers class com.anurag.eduapp.** {
+    *** Companion;
+}
+-keepclasseswithmembers class com.anurag.eduapp.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+
+# Required for Credential Manager to work in release
+-keep class androidx.credentials.** { *; }
+-keep class com.google.android.libraries.identity.googleid.** { *; }
+-keep class com.google.android.gms.auth.** { *; }
+
+# Keep your User model from being obfuscated
+-keep class com.anurag.eduapp.data.firebase.model.User { *; }
+-keepclassmembers class com.anurag.eduapp.data.firebase.model.User { *; }

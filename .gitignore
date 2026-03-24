@@ -19,4 +19,5 @@
 gradle-wrapper.jar
 local.properties
 gradle.properties
+google-services.json
 

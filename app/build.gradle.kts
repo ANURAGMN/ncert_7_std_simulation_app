@@ -1,23 +1,24 @@
 import java.util.Properties
 import kotlin.apply
 
-plugins {
+ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.services)
     id("kotlin-parcelize")
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.kotlin.android)
 }
 
 android {
-    namespace = "com.anurag.eduai"
+    namespace = "com.anurag.eduapp"
     compileSdk =36
 
     defaultConfig {
-        applicationId = "com.anurag.eduai"
-        minSdk = 27
-        targetSdk = 36
+        applicationId = "com.anurag.eduapp"
+        minSdk = 28
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -34,7 +35,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -47,6 +49,10 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
+    }
+    kotlinOptions {
+        jvmTarget = "11"
     }
 }
 
@@ -61,6 +67,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.googleid)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.lifecycle.process)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -73,7 +80,6 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
-    implementation(libs.androidx.hilt.work)
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
@@ -85,11 +91,15 @@ dependencies {
     // Firebase Libraries
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
-
+    implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
     // WorkManager
     implementation(libs.androidx.work.runtime.ktx)
 
-    implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.material:material-icons-extended")
+    // Material3 and Material Icons
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
 
+    // Image Loading
+    implementation(libs.glide)
+    implementation(libs.glide.compose)
 }
