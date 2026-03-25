@@ -95,9 +95,22 @@ class ConceptViewModel @Inject constructor(
                     unlockFirstConcept(studentId, conceptUiModels[0].id)
                 }
 
-                // Count completed concepts
-                val completedCount = conceptUiModels.count { it.status == ConceptStatus.COMPLETED }
-                val totalCount = chapter?.totalConcepts ?: 0
+                // Filter concepts with simulation URLs (visible concepts)
+                // IMPORTANT: This filtering MUST match ConceptScreen filtering exactly
+                val visibleConcepts = conceptUiModels.filter { concept ->
+                    (!concept.simulationUrl.isNullOrBlank() && concept.simulationUrl != "Not found") ||
+                    (!concept.simulationUrlKannada.isNullOrBlank() && concept.simulationUrlKannada != "Not found")
+                }
+
+                // Count completed visible concepts
+                val completedCount = visibleConcepts.count { it.status == ConceptStatus.COMPLETED }
+                val totalCount = visibleConcepts.size  // Only visible concepts
+
+                // Log for debugging - shows actual visible count
+                DebugLogger.debugLog(
+                    "ConceptViewModel",
+                    "Chapter: $chapterId | Total Concepts: ${conceptUiModels.size} | Visible with Simulation: $totalCount | Completed: $completedCount"
+                )
 
                 // progress UI model
                 val progressUiModel = buildProgressUiModel(
@@ -165,6 +178,31 @@ class ConceptViewModel @Inject constructor(
             DebugLogger.debugLog("ConceptViewModel", "First concept unlocked: $conceptId")
         } catch (e: Exception) {
             DebugLogger.debugLog("ConceptViewModel", "Error unlocking first concept: ${e.message}")
+        }
+    }
+
+    /**
+     * Track that a concept's simulation was viewed
+     * Called when user opens and views a simulation
+     */
+    fun markSimulationViewed(conceptId: String) {
+        viewModelScope.launch {
+            try {
+                val studentId = sharedPrefs.getUserId() ?: ""
+                if (studentId.isNotEmpty() && conceptId.isNotEmpty()) {
+                    conceptRepository.updateProgressStatus(
+                        studentId = studentId,
+                        itemType = "CONCEPT",
+                        itemId = conceptId,
+                        newStatus = "COMPLETED",
+                        progressPercentage = 100,
+                        timestamp = System.currentTimeMillis()
+                    )
+                    DebugLogger.debugLog("ConceptViewModel", "Simulation viewed for concept: $conceptId")
+                }
+            } catch (e: Exception) {
+                DebugLogger.errorLog("ConceptViewModel", "Error marking simulation viewed: ${e.message}")
+            }
         }
     }
 

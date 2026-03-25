@@ -95,10 +95,11 @@ fun BottomNavBar(onLogout: () -> Unit = {}) {
                     onNavigateToChapters = { subjectId ->
                         navController.navigate("chapters/$subjectId")
                     },
-                    onSimulationUrlClick = { title, url ->
+                    onSimulationUrlClick = { title, url, conceptId ->
                         // Encode the URL to prevent navigation crashes due to '/'
                         val encodedUrl = java.net.URLEncoder.encode(url, "UTF-8")
-                        navController.navigate("concept_sim_view/$encodedUrl/$title")
+                        val encodedTitle = java.net.URLEncoder.encode(title, "UTF-8")
+                        navController.navigate("concept_sim_view/$encodedUrl/$encodedTitle/$conceptId")
                     }
                 )
             }
@@ -156,8 +157,8 @@ fun BottomNavBar(onLogout: () -> Unit = {}) {
                     onStudyClick = { chapterId, type ->
                         navController.navigate("concepts/$chapterId/$type")
                     },
-                    onSimulationClick = { chapterId, type ->
-                        navController.navigate("concepts/$chapterId/$type")
+                    onSimulationClick = { chapterId, type, conceptId ->
+                        navController.navigate("concepts/$chapterId/$type/$conceptId")
                     },
                     onGoHome = {
                         navController.navigate("home") {
@@ -188,10 +189,11 @@ fun BottomNavBar(onLogout: () -> Unit = {}) {
                     chapterId = chapterId,
                     type = type,
                     onBackClick = { navController.popBackStack() },
-                    onSimulationClick = { title, url ->
+                    onSimulationClick = { title, url, conceptId ->
                         //  Encode the URL to prevent navigation crashes due to '/'
                         val encodedUrl = java.net.URLEncoder.encode(url, "UTF-8")
-                        navController.navigate("concept_sim_view/$encodedUrl/$title")
+                        val encodedTitle = java.net.URLEncoder.encode(title, "UTF-8")
+                        navController.navigate("concept_sim_view/$encodedUrl/$encodedTitle/$conceptId")
                     },
                     onGoHome = {
                         navController.navigate("home") {
@@ -237,18 +239,21 @@ fun BottomNavBar(onLogout: () -> Unit = {}) {
             }
 
             composable(
-                route = "concept_sim_view/{url}/{title}",
+                route = "concept_sim_view/{url}/{title}/{conceptId}",
                 arguments = listOf(
                     navArgument("url") { type = NavType.StringType },
-                    navArgument("title") { type = NavType.StringType }
+                    navArgument("title") { type = NavType.StringType },
+                    navArgument("conceptId") { type = NavType.StringType }
                 )
             ) { backStackEntry ->
                 val url = backStackEntry.arguments?.getString("url") ?: ""
                 val title = backStackEntry.arguments?.getString("title") ?: "Simulation"
+                val conceptId = backStackEntry.arguments?.getString("conceptId") ?: ""
 
                 ConceptSimulationViewer(
                     simulationUrl = url,
                     simulationTitle = title,
+                    conceptId = conceptId,
                     onBackClick = { navController.popBackStack() }
                 )
             }

@@ -101,6 +101,7 @@ interface ProgressDao {
      * concept Next 3 items - NOT_STARTED concepts ordered by ConceptEntity.orderIndex Limit to 4
      * total items
      *
+     * Only includes concepts with simulation URLs
      * Automatically emits new list whenever progress changes
      */
     @Query(
@@ -110,6 +111,11 @@ interface ProgressDao {
         WHERE p.studentId = :studentId 
         AND p.itemType = :itemType 
         AND p.status != 'COMPLETED'
+        AND (
+            (c.simulationUrl IS NOT NULL AND c.simulationUrl != '' AND c.simulationUrl != 'Not found')
+            OR
+            (c.simulationUrlKannada IS NOT NULL AND c.simulationUrlKannada != '' AND c.simulationUrlKannada != 'Not found')
+        )
         ORDER BY 
             CASE WHEN p.status = 'IN_PROGRESS' THEN 0 ELSE 1 END ASC,
             CASE WHEN p.status = 'IN_PROGRESS' THEN p.lastAccessedAt ELSE 0 END DESC,
@@ -134,32 +140,48 @@ interface ProgressDao {
     )
     suspend fun getLastCompletedConcept(studentId: String): ProgressEntity?
 
-    /** Get the total number of completed concepts for a student */
+    /** Get the total number of completed concepts for a student (only simulation concepts with URLs) */
     @Query(
         """
         SELECT COUNT(*) 
-        FROM progress 
-        WHERE studentId = :studentId 
-        AND itemType = 'CONCEPT' 
-        AND status = 'COMPLETED'
+        FROM progress p
+        INNER JOIN concepts c ON p.itemId = c.conceptId
+        WHERE p.studentId = :studentId 
+        AND p.itemType = 'CONCEPT' 
+        AND p.status = 'COMPLETED'
+        AND c.type = 'SIMULATION'
+        AND (
+            (c.simulationUrl IS NOT NULL AND c.simulationUrl != '' AND c.simulationUrl != 'Not found')
+            OR
+            (c.simulationUrlKannada IS NOT NULL AND c.simulationUrlKannada != '' AND c.simulationUrlKannada != 'Not found')
+        )
     """
     )
     suspend fun getTotalCompletedConcepts(studentId: String): Int
 
     /**
-     * Get the number of concepts cleared in the last 7 days, day-wise Returns a list of
-     * DailyConceptCount with date and count Ordered from most recent (today) to 7 days ago
+     * Get the number of concepts cleared in the last 7 days, day-wise
+     * Only counts simulation concepts with valid URLs
+     * Returns a list of DailyConceptCount with date and count
+     * Ordered from most recent (today) to 7 days ago
      */
     @Query(
         """
         SELECT 
             DATE(completedAt / 1000, 'unixepoch', 'localtime') as date,
             COUNT(*) as count
-        FROM progress
-        WHERE studentId = :studentId
-        AND itemType = 'CONCEPT'
-        AND status = 'COMPLETED'
-        AND completedAt >= :sevenDaysAgoTimestamp
+        FROM progress p
+        INNER JOIN concepts c ON p.itemId = c.conceptId
+        WHERE p.studentId = :studentId
+        AND p.itemType = 'CONCEPT'
+        AND p.status = 'COMPLETED'
+        AND c.type = 'SIMULATION'
+        AND p.completedAt >= :sevenDaysAgoTimestamp
+        AND (
+            (c.simulationUrl IS NOT NULL AND c.simulationUrl != '' AND c.simulationUrl != 'Not found')
+            OR
+            (c.simulationUrlKannada IS NOT NULL AND c.simulationUrlKannada != '' AND c.simulationUrlKannada != 'Not found')
+        )
         GROUP BY DATE(completedAt / 1000, 'unixepoch', 'localtime')
         ORDER BY date DESC
     """
@@ -190,6 +212,12 @@ interface ProgressDao {
     WHERE 
         s.classLevel = :classLevel
         AND s.subjectId = :subjectId
+        AND c.type = 'SIMULATION'
+        AND (
+            (c.simulationUrl IS NOT NULL AND c.simulationUrl != '' AND c.simulationUrl != 'Not found')
+            OR
+            (c.simulationUrlKannada IS NOT NULL AND c.simulationUrlKannada != '' AND c.simulationUrlKannada != 'Not found')
+        )
     GROUP BY ch.chapterId
     ORDER BY ch.orderIndex ASC
     """)

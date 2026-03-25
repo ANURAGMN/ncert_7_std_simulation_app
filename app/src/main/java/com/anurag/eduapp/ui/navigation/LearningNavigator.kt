@@ -1,6 +1,5 @@
 package com.anurag.eduapp.ui.navigation
 
-import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -11,6 +10,7 @@ import com.anurag.eduapp.ui.screens.chapterscreen.ChapterScreen
 import com.anurag.eduapp.ui.screens.conceptscreen.ConceptScreen
 import com.anurag.eduapp.ui.screens.conceptscreen.components.ConceptSimulationViewer
 import com.anurag.eduapp.ui.screens.subjectscreen.SubjectScreen
+import androidx.compose.runtime.Composable
 
 object LearningRoutes {
     const val HOME = "home"
@@ -50,7 +50,7 @@ fun LearningNavigator(
                 onStudyClick = { chapterId, type ->
                     navController.navigate("concepts/$chapterId/$type")
                 },
-                onSimulationClick = { chapterId, type ->
+                onSimulationClick = { chapterId, type, conceptId ->
                     navController.navigate("concepts/$chapterId/$type")
                 },
                 onGoHome = onGoHome,
@@ -65,9 +65,10 @@ fun LearningNavigator(
                 chapterId = chapterId,
                 type = type,
                 onBackClick = { navController.popBackStack() },
-                onSimulationClick = { title, url ->
+                onSimulationClick = { title, url, conceptId ->
                     val encodedUrl = java.net.URLEncoder.encode(url, "UTF-8")
-                    navController.navigate("concept_sim_view/$encodedUrl/$title")
+                    val encodedTitle = java.net.URLEncoder.encode(title, "UTF-8")
+                    navController.navigate("concept_sim_view/$encodedUrl/$encodedTitle/$conceptId")
                 },
                 onGoHome = onGoHome,
                 onGoSetting = onGoSetting
@@ -75,18 +76,21 @@ fun LearningNavigator(
         }
 
         composable(
-            route = "concept_sim_view/{url}/{title}",
+            route = "concept_sim_view/{url}/{title}/{conceptId}",
             arguments = listOf(
                 navArgument("url") { type = NavType.StringType },
-                navArgument("title") { type = NavType.StringType }
+                navArgument("title") { type = NavType.StringType },
+                navArgument("conceptId") { type = NavType.StringType }
             )
         ) { backStackEntry ->
             val url = backStackEntry.arguments?.getString("url") ?: ""
             val title = backStackEntry.arguments?.getString("title") ?: "Simulation"
+            val conceptId = backStackEntry.arguments?.getString("conceptId") ?: ""
 
             ConceptSimulationViewer(
                 simulationUrl = url,
                 simulationTitle = title,
+                conceptId = conceptId,
                 onBackClick = { navController.popBackStack() }
             )
         }

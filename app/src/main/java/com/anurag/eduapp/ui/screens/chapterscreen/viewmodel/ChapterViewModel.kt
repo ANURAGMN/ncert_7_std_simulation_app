@@ -54,10 +54,12 @@ class ChapterViewModel @Inject constructor(
                 val chapterUiModels = chapters.map { chapter ->
                     val progress = progressMap[chapter.chapterId]
                     val completedConcepts = progress?.completedConcepts ?: 0
-                    val totalConcepts = chapter.totalConcepts
+                    // Use filtered total concepts from progress query (only simulation concepts)
+                    val totalConcepts = progress?.totalConcepts ?: 0
 
                     // Determine status based on completion
                     val status = when {
+                        totalConcepts == 0 -> ChapterStatus.NOT_STARTED
                         completedConcepts == 0 -> ChapterStatus.NOT_STARTED
                         completedConcepts >= totalConcepts -> ChapterStatus.COMPLETED
                         else -> ChapterStatus.IN_PROGRESS
@@ -65,7 +67,7 @@ class ChapterViewModel @Inject constructor(
 
                     ChapterUiModel(
                         id = chapter.chapterId,
-                        orderIndex =chapter.orderIndex,
+                        orderIndex = chapter.orderIndex,
                         name = chapter.getLocalizedName(),  // Display name (localized)
                         englishName = chapter.chapterName,  // API name (always English)
                         totalConcepts = totalConcepts,

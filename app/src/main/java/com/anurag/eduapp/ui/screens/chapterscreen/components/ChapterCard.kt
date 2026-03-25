@@ -155,6 +155,38 @@ fun ChapterCard(
 
                         Spacer(modifier = Modifier.height(dimens.spaceMedium))
 
+                        // Progress Bar with percentage
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            // Progress bar
+                            LinearProgressIndicator(
+                                progress = {
+                                    if (chapter.totalConcepts > 0) {
+                                        chapter.completedConcepts.toFloat() / chapter.totalConcepts
+                                    } else {
+                                        0f
+                                    }
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(6.dp)
+                                    .clip(RoundedCornerShape(3.dp)),
+                                trackColor = ColorHint,
+                                color = getProgressBarColor(chapter.status)
+                            )
+
+                            // Progress text
+                            Text(
+                                text = "${chapter.completedConcepts}/${chapter.totalConcepts} concepts completed",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = TextSecondary,
+                                fontSize = 10.sp
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(dimens.spaceMedium))
 
                         Column(
                             modifier = Modifier.fillMaxWidth(),
@@ -175,7 +207,7 @@ fun ChapterCard(
                                             tint = TextPrimary
                                         )
                                     },
-                                    modifier =Modifier.fillMaxWidth() ,
+                                    modifier = Modifier.fillMaxWidth(),
                                     onClick = onSimulationClick
                                 )
                             }
@@ -196,6 +228,12 @@ private fun getChapterStatusText(status: ChapterStatus): String = when (status) 
 }
 
 private fun getChapterStatusColor(status: ChapterStatus): Color = when (status) {
+    ChapterStatus.COMPLETED -> CompleteTextColor
+    ChapterStatus.IN_PROGRESS -> InProgressTextColor
+    ChapterStatus.NOT_STARTED -> Color.Gray
+}
+
+private fun getProgressBarColor(status: ChapterStatus): Color = when (status) {
     ChapterStatus.COMPLETED -> CompleteTextColor
     ChapterStatus.IN_PROGRESS -> InProgressTextColor
     ChapterStatus.NOT_STARTED -> Color.Gray

@@ -29,7 +29,7 @@ import com.anurag.eduapp.data.local.entities.ProgressEntity
 @Composable
 fun PracticeSimulationCard(
     progressSimulations: List<Pair<ProgressEntity?, ConceptEntity?>>,
-    onSimulationUrlClick: (String, String) -> Unit = { _, _ -> } // Click simulation button - opens URL viewer
+    onSimulationUrlClick: (String, String, String) -> Unit = { _, _, _ -> } // Click simulation button - opens URL viewer (title, url, conceptId)
 ) {
     val dimes = LocalDimensions.current
 
@@ -86,8 +86,8 @@ fun PracticeSimulationCard(
                             concept = conceptUiModel,
                             serialNumber = index + 1,
                             onSimulationClick = { title, url ->
-                                // Clicking "Simulation" button opens URL viewer
-                                onSimulationUrlClick(title, url)
+                                // Clicking "Simulation" button opens URL viewer with conceptId
+                                onSimulationUrlClick(title, url, sim.conceptId)
                             }
                         )
                     }

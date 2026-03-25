@@ -33,7 +33,7 @@ import com.anurag.eduapp.utils.StreakManager
 fun HomeScreen(
     onNavigateToLearning: () -> Unit = {},
     onNavigateToChapters: (String) -> Unit = {},
-    onSimulationUrlClick: (String, String) -> Unit = { _, _ -> }
+    onSimulationUrlClick: (String, String, String) -> Unit = { _, _, _ -> }
 ) {
     // Analytics Tracking
     TrackScreenEvent(screenName = ScreenName.HOME)
@@ -113,8 +113,8 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(dimens.spaceSmall))
                 PracticeSimulationCard(
                     progressSimulations = progressSimulations,
-                    onSimulationUrlClick = { title, url ->
-                        onSimulationUrlClick(title, url)
+                    onSimulationUrlClick = { title, url, conceptId ->
+                        onSimulationUrlClick(title, url, conceptId)
                     }
                 )
             }

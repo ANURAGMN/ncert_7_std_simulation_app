@@ -33,7 +33,7 @@ fun ChapterScreen(
     subjectId: String,
     onBackClick: () -> Unit = {},
     onStudyClick: (String, String) -> Unit = {_, _ -> },
-    onSimulationClick: (String, String) -> Unit = {_, _ -> },
+    onSimulationClick: (String, String, String) -> Unit = {_, _, _ -> },
     onGoHome: () -> Unit = {},
     onGoSetting: () -> Unit = {},
     onProgressClick: () -> Unit = {},
@@ -93,7 +93,7 @@ fun ChapterScreen(
                         chapter = chapterUiModel,
                         subjectName = state.subjectName,
                         onStudyClick = { onStudyClick(chapterUiModel.id, "STUDY") },
-                        onSimulationClick = { onSimulationClick(chapterUiModel.id, "SIMULATION") }
+                        onSimulationClick = { onStudyClick(chapterUiModel.id, "SIMULATION") }
                     )
                 }
             }

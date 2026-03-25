@@ -51,7 +51,7 @@ fun ConceptScreen(
     chapterId: String,
     type: String,
     onBackClick: () -> Unit = {},
-    onSimulationClick: (String, String) -> Unit = { _, _ -> },
+    onSimulationClick: (String, String, String) -> Unit = { _, _, _ -> },
     onGoHome:() -> Unit = {},
     onGoSetting:() -> Unit = {},
     viewModel: ConceptViewModel = hiltViewModel(),
@@ -137,8 +137,10 @@ fun ConceptScreen(
                             onClick = {
                             },
                             onSimulationClick = { title, url ->
-                                // Pass everything back to the navigator
-                                onSimulationClick( title, url)
+                                // Mark simulation as viewed in ViewModel
+                                viewModel.markSimulationViewed(conceptUiModel.id)
+                                // Navigate to simulation viewer with conceptId
+                                onSimulationClick(title, url, conceptUiModel.id)
                             }
                         )
                     }
