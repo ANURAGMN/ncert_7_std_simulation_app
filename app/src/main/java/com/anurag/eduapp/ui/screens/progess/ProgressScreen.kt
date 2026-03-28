@@ -49,6 +49,7 @@ fun ProgressScreen(
 
     // Collect all state from ViewModel
     val totalCompletedConcept by viewModel.totalCompletedConcept.collectAsState()
+    val totalCompletedSimulations by viewModel.totalCompletedSimulations.collectAsState()
     val streakCount by viewModel.streakCount.collectAsState()
     val weeklyProgressData by viewModel.weeklyProgressData.collectAsState()
     val chapterProgress by viewModel.chapterProgressSummary.collectAsState()
@@ -103,9 +104,7 @@ fun ProgressScreen(
         ) {
             StatusCardGrid(
                 streakCount = streakCount,
-                completedConceptCount = totalCompletedConcept,
-                completedSimulationCount = 0, // TODO: Get from ViewModel when available
-                score = 78 // TODO: Get from ViewModel when available
+                completedSimulationCount = totalCompletedSimulations
             )
 
             Spacer(modifier = Modifier.height(dimes.sectionSpacing))

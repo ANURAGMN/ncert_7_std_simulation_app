@@ -59,6 +59,9 @@ class ProgressScreenViewModel @Inject constructor(
     private val _totalCompletedConcept = MutableStateFlow(0)
     val totalCompletedConcept: StateFlow<Int> = _totalCompletedConcept.asStateFlow()
 
+    private val _totalCompletedSimulations = MutableStateFlow(0)
+    val totalCompletedSimulations: StateFlow<Int> = _totalCompletedSimulations.asStateFlow()
+
     private val _streakCount = MutableStateFlow(0)
     val streakCount: StateFlow<Int> = _streakCount.asStateFlow()
 
@@ -108,6 +111,7 @@ class ProgressScreenViewModel @Inject constructor(
         getStudent()
         getStreak()
         getTotalCompletedConcept()
+        getTotalCompletedSimulations()
     }
 
     // --- Data Loading Functions ---
@@ -116,6 +120,13 @@ class ProgressScreenViewModel @Inject constructor(
         viewModelScope.launch {
             val result = progressDao.getTotalCompletedConcepts(userId)
             _totalCompletedConcept.value = result
+        }
+    }
+
+    fun getTotalCompletedSimulations() {
+        viewModelScope.launch {
+            val result = progressDao.getTotalCompletedSimulations(userId)
+            _totalCompletedSimulations.value = result
         }
     }
 
@@ -262,6 +273,11 @@ class ProgressScreenViewModel @Inject constructor(
             if (selected.size < 4) {
                 val remaining = 4 - selected.size
                 selected.addAll(notStarted.take(remaining))
+            }
+            if (selected.size < 4) {
+                val completed = _completedChapters.value
+                val remainingSpace = 4 - selected.size
+                selected.addAll(completed.take(remainingSpace))
             }
             selected
         }

@@ -83,6 +83,7 @@ class StreakManager(context: Context) {
     /**
      * Provides the current streak value with validation.
      * If days were skipped since last activity, returns 0 instead of the old streak.
+     * On first activity (no lastStreakDay), returns 1.
      *
      * @return Current valid streak count, or 0 if streak has expired
      */
@@ -91,10 +92,10 @@ class StreakManager(context: Context) {
         val lastStreakDay = prefs.getLong(KEY_LAST_STREAK_DAY, 0L)
         val storedStreak = prefs.getInt(KEY_STREAK_COUNT, 0)
 
-        // No streak recorded yet
+        // No streak recorded yet - user viewing progress screen for first time
         if (lastStreakDay == 0L) {
-            DebugLogger.debugLog("StreakManager", "No streak data found")
-            return 0
+            DebugLogger.debugLog("StreakManager", "No streak data found - returning 1 for first day")
+            return 1
         }
 
         // Check if streak is still valid

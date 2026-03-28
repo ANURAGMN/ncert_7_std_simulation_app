@@ -21,9 +21,7 @@ import com.anurag.eduapp.ui.theme.LocalDimensions
 @Composable
 fun StatusCardGrid(
     streakCount: Int,
-    completedConceptCount: Int,
-    completedSimulationCount: Int,
-    score: Int
+    completedSimulationCount: Int
 ) {
     val dimes = LocalDimensions.current
 
@@ -39,33 +37,11 @@ fun StatusCardGrid(
             )
             Spacer(modifier = Modifier.padding(dimes.spaceSmall))
             StatusCardItem(
-                icon = painterResource(R.drawable.ic_book),
-                value = completedConceptCount,
-                title = stringResource(R.string.concept),
-                iconColor = IconColorUnspecified,
-                iconContentDescription = stringResource(R.string.book_icon),
-                modifier = Modifier.weight(0.5f)
-            )
-        }
-
-        Spacer(modifier = Modifier.padding(dimes.spaceSmall))
-
-        Row(modifier = Modifier.fillMaxWidth()) {
-            StatusCardItem(
                 icon = painterResource(R.drawable.ic_simulation),
                 value = completedSimulationCount,
                 title = stringResource(R.string.simulation),
                 iconColor = IconColorUnspecified,
                 iconContentDescription = stringResource(R.string.simulation_icon),
-                modifier = Modifier.weight(0.5f)
-            )
-            Spacer(modifier = Modifier.padding(dimes.spaceSmall))
-            StatusCardItem(
-                icon = painterResource(R.drawable.ic_graph),
-                value = score,
-                title = stringResource(R.string.average_score),
-                iconColor = IconColorUnspecified,
-                iconContentDescription = stringResource(R.string.graph_icon),
                 modifier = Modifier.weight(0.5f)
             )
         }

@@ -159,6 +159,25 @@ interface ProgressDao {
     )
     suspend fun getTotalCompletedConcepts(studentId: String): Int
 
+    /** Get the total number of completed simulations for a student */
+    @Query(
+        """
+        SELECT COUNT(*) 
+        FROM progress p
+        INNER JOIN concepts c ON p.itemId = c.conceptId
+        WHERE p.studentId = :studentId 
+        AND p.itemType = 'CONCEPT' 
+        AND p.status = 'COMPLETED'
+        AND c.type = 'SIMULATION'
+        AND (
+            (c.simulationUrl IS NOT NULL AND c.simulationUrl != '' AND c.simulationUrl != 'Not found')
+            OR
+            (c.simulationUrlKannada IS NOT NULL AND c.simulationUrlKannada != '' AND c.simulationUrlKannada != 'Not found')
+        )
+    """
+    )
+    suspend fun getTotalCompletedSimulations(studentId: String): Int
+
     /**
      * Get the number of concepts cleared in the last 7 days, day-wise
      * Only counts simulation concepts with valid URLs
