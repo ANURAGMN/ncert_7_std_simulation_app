@@ -192,13 +192,18 @@ class ConceptViewModel @Inject constructor(
     }
 
     /**
-     * Track that a concept's simulation was viewed
-     * Called when user opens and views a simulation
+     * Track that a simulation has completed
+     * Called when the simulation WebView finishes loading successfully
+     * Sets status to COMPLETED and records both startedAt and completedAt times
+     * This simplifies the flow - when simulation loads, it's considered completed by the user
      */
-    fun markSimulationViewed(conceptId: String) {
+    fun markSimulationCompleted(conceptId: String) {
         viewModelScope.launch {
             try {
                 val studentId = sharedPrefs.getUserId() ?: ""
+                val currentTime = System.currentTimeMillis()
+                DebugLogger.debugLog("ConceptViewModel", "markSimulationCompleted called for conceptId: $conceptId, studentId: $studentId")
+
                 if (studentId.isNotEmpty() && conceptId.isNotEmpty()) {
                     conceptRepository.updateProgressStatus(
                         studentId = studentId,
@@ -206,12 +211,14 @@ class ConceptViewModel @Inject constructor(
                         itemId = conceptId,
                         newStatus = "COMPLETED",
                         progressPercentage = 100,
-                        timestamp = System.currentTimeMillis()
+                        timestamp = currentTime
                     )
-                    DebugLogger.debugLog("ConceptViewModel", "Simulation viewed for concept: $conceptId")
+                    DebugLogger.debugLog("ConceptViewModel", "✅ Simulation marked as COMPLETED for concept: $conceptId at $currentTime")
+                } else {
+                    DebugLogger.errorLog("ConceptViewModel", "❌ Failed to mark simulation completed - studentId: $studentId, conceptId: $conceptId")
                 }
             } catch (e: Exception) {
-                DebugLogger.errorLog("ConceptViewModel", "Error marking simulation viewed: ${e.message}")
+                DebugLogger.errorLog("ConceptViewModel", "❌ Error marking simulation completed: ${e.message} | ${e.stackTraceToString()}")
             }
         }
     }

@@ -72,7 +72,7 @@ interface ProgressDao {
                         if (newStatus == "COMPLETED") timestamp
                         else existing.completedAt,
                     startedAt = existing.startedAt ?:
-                        if (newStatus == "IN_PROGRESS") timestamp else null,
+                        if (newStatus == "IN_PROGRESS" || newStatus == "COMPLETED") timestamp else null,
                     lastAccessedAt = timestamp,
                     updatedAt = timestamp,
                     progressPercentage = progressPercentage.coerceIn(0, 100),
@@ -87,7 +87,7 @@ interface ProgressDao {
                     itemId = itemId,
                     status = newStatus,
                     progressPercentage = progressPercentage.coerceIn(0, 100),
-                    startedAt = if (newStatus == "IN_PROGRESS") timestamp else null,
+                    startedAt = if (newStatus == "IN_PROGRESS" || newStatus == "COMPLETED") timestamp else null,
                     completedAt = if (newStatus == "COMPLETED") timestamp else null,
                     lastAccessedAt = timestamp,
                     updatedAt = timestamp

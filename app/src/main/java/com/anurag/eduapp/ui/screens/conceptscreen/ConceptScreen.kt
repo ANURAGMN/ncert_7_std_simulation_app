@@ -137,8 +137,6 @@ fun ConceptScreen(
                             onClick = {
                             },
                             onSimulationClick = { title, url ->
-                                // Mark simulation as viewed in ViewModel
-                                viewModel.markSimulationViewed(conceptUiModel.id)
                                 // Navigate to simulation viewer with conceptId
                                 onSimulationClick(title, url, conceptUiModel.id)
                             }

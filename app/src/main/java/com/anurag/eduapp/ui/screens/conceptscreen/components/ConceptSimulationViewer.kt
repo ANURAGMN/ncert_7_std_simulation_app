@@ -15,7 +15,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -47,14 +46,19 @@ fun ConceptSimulationViewer(
     viewModel: ConceptViewModel = hiltViewModel()
 ) {
     val dimens = LocalDimensions.current
-    val isSimulationMarked = remember { mutableStateOf(false) }
+    val isSimulationCompleted = remember { mutableStateOf(false) }
 
-    // Mark simulation as viewed when component appears - same logic as ConceptScreen
-    LaunchedEffect(conceptId) {
-        if (conceptId.isNotEmpty() && !isSimulationMarked.value) {
-            viewModel.markSimulationViewed(conceptId)
-            isSimulationMarked.value = true
+    // Mark simulation as completed when WebView page finishes loading successfully
+    val handlePageLoaded = {
+        if (conceptId.isNotEmpty() && !isSimulationCompleted.value) {
+            // Mark as completed immediately when page loads
+            viewModel.markSimulationCompleted(conceptId)
+            isSimulationCompleted.value = true
         }
+    }
+
+     val handleBackClick = {
+        onBackClick()
     }
 
     Column(
@@ -69,7 +73,7 @@ fun ConceptSimulationViewer(
                 .padding(dimens.spaceSmall),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = onBackClick) {
+            IconButton(onClick = handleBackClick) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.back),
@@ -96,6 +100,7 @@ fun ConceptSimulationViewer(
             SimulationWebView(
                 url = simulationUrl,
                 modifier = Modifier.fillMaxSize(),
+                onPageLoaded = handlePageLoaded
             )
         }
     }

@@ -9,20 +9,29 @@ import androidx.compose.ui.viewinterop.AndroidView
 
 /** WebView component for rendering simulation HTML */
 @Composable
-fun SimulationWebView(url: String, modifier: Modifier = Modifier) {
+fun SimulationWebView(
+    url: String,
+    modifier: Modifier = Modifier,
+    onPageLoaded: () -> Unit = {}
+) {
     AndroidView(
-            factory = { context ->
-                WebView(context).apply {
-                    settings.apply {
-                        javaScriptEnabled = true
-                        domStorageEnabled = true
-                        loadWithOverviewMode = true
-                        useWideViewPort = true
-                    }
-                    webViewClient = WebViewClient()
-                    loadUrl(url)
+        factory = { context ->
+            WebView(context).apply {
+                settings.apply {
+                    javaScriptEnabled = true
+                    domStorageEnabled = true
+                    loadWithOverviewMode = true
+                    useWideViewPort = true
                 }
-            },
-            modifier = modifier.fillMaxSize()
+                webViewClient = object : WebViewClient() {
+                    override fun onPageFinished(view: WebView?, url: String?) {
+                        super.onPageFinished(view, url)
+                        onPageLoaded()
+                    }
+                }
+                loadUrl(url)
+            }
+        },
+        modifier = modifier.fillMaxSize()
     )
 }
