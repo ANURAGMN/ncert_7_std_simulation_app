@@ -80,6 +80,13 @@ fun ChapterScreen(
             ) {
                 Text(text = stringResource(R.string.unable_to_load_chapters))
             }
+        } else if (state.chapters.isEmpty()) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = stringResource(R.string.no_chapters_available))
+            }
         } else {
             LazyColumn(
                 modifier = Modifier

@@ -184,6 +184,7 @@
     <string name="open_email_app_msg">Open Email App</string>
     <string name="unable_to_load_subjects">Unable to load subjects</string>
     <string name="unable_to_load_chapters">Unable to load chapters</string>
+    <string name="no_chapters_available">No chapters with simulation content available</string>
     <string name="unable_to_load_concepts">Unable to load concepts</string>
     <string name="unable_to_load_concept_details">Unable to load concept details</string>
     <string name="class_and_subject">Class %1$d - %2$s</string>

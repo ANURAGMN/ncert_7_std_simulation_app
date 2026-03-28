@@ -52,15 +52,19 @@ class ChapterViewModel @Inject constructor(
                 // Convert to map for easy lookup
                 val progressMap = progressList.associateBy { it.chapterId }
 
-                val chapterUiModels = chapters.map { chapter ->
+                // Filter chapters to only show those with simulation concepts that have valid URLs
+                val chapterUiModels = chapters.mapNotNull { chapter ->
                     val progress = progressMap[chapter.chapterId]
                     val completedConcepts = progress?.completedConcepts ?: 0
-                    // Use filtered total concepts from progress query (only simulation concepts)
                     val totalConcepts = progress?.totalConcepts ?: 0
+
+                    // Skip chapters with no simulation concepts that have valid URLs
+                    if (totalConcepts == 0) {
+                        return@mapNotNull null
+                    }
 
                     // Determine status based on completion
                     val status = when {
-                        totalConcepts == 0 -> ProgressStatus.NOT_STARTED
                         completedConcepts == 0 -> ProgressStatus.NOT_STARTED
                         completedConcepts >= totalConcepts -> ProgressStatus.COMPLETED
                         else -> ProgressStatus.IN_PROGRESS
