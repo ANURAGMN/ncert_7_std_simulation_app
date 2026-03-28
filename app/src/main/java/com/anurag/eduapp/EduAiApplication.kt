@@ -1,6 +1,7 @@
 package com.anurag.eduapp
 
-import  android.app.Application
+import android.app.Application
+import androidx.work.BackoffPolicy
 import androidx.work.Configuration
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
@@ -67,7 +68,13 @@ class EduAiApplication : Application(), Configuration.Provider {
         val request =
             PeriodicWorkRequestBuilder<WeeklySyncWorker>(
                 1, TimeUnit.DAYS // testing
-            ).build()
+            )
+                .setBackoffCriteria(
+                    BackoffPolicy.EXPONENTIAL,
+                    1, // Initial delay
+                    TimeUnit.MINUTES
+                )
+                .build()
 
         WorkManager.getInstance(this)
             .enqueueUniquePeriodicWork(
@@ -76,6 +83,6 @@ class EduAiApplication : Application(), Configuration.Provider {
                 request
             )
 
-        DebugLogger.debugLog("EduAiApplication", "Weekly sync worker scheduled")
+        DebugLogger.debugLog("EduAiApplication", "Weekly sync worker scheduled with exponential backoff retry ")
     }
 }
