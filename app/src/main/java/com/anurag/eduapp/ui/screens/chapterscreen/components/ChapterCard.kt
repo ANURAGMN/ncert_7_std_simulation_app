@@ -61,7 +61,6 @@ fun ChapterCard(
     chapter: ChapterUiModel,
     onStudyClick: () -> Unit = {},
     onSimulationClick: () -> Unit = {},
-    subjectName: String = ""
 ) {
     val dimens = LocalDimensions.current
     val progress = chapter.progressUiModel

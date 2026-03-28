@@ -97,7 +97,6 @@ fun ChapterScreen(
                     val chapterUiModel = state.chapters[index]
                     ChapterCard(
                         chapter = chapterUiModel,
-                        subjectName = state.subjectName,
                         onStudyClick = { onStudyClick(chapterUiModel.id, "STUDY") },
                         onSimulationClick = { onStudyClick(chapterUiModel.id, "SIMULATION") }
                     )
