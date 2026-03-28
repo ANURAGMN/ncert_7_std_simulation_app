@@ -33,7 +33,6 @@ fun ChapterScreen(
     subjectId: String,
     onBackClick: () -> Unit = {},
     onStudyClick: (String, String) -> Unit = {_, _ -> },
-    onSimulationClick: (String, String, String) -> Unit = {_, _, _ -> },
     onGoHome: () -> Unit = {},
     onGoSetting: () -> Unit = {},
     onProgressClick: () -> Unit = {},

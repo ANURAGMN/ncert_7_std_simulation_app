@@ -36,7 +36,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.anurag.eduapp.MainActivity
 import com.anurag.eduapp.R
 import com.anurag.eduapp.ui.screens.loginscreen.components.FooterCard
 import com.anurag.eduapp.ui.screens.loginscreen.components.GoogleLoginButton

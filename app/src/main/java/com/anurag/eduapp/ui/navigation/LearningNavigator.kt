@@ -50,9 +50,6 @@ fun LearningNavigator(
                 onStudyClick = { chapterId, type ->
                     navController.navigate("concepts/$chapterId/$type")
                 },
-                onSimulationClick = { chapterId, type, conceptId ->
-                    navController.navigate("concepts/$chapterId/$type")
-                },
                 onGoHome = onGoHome,
                 onGoSetting = onGoSetting
             )

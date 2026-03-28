@@ -157,9 +157,6 @@ fun BottomNavBar(onLogout: () -> Unit = {}) {
                     onStudyClick = { chapterId, type ->
                         navController.navigate("concepts/$chapterId/$type")
                     },
-                    onSimulationClick = { chapterId, type, conceptId ->
-                        navController.navigate("concepts/$chapterId/$type/$conceptId")
-                    },
                     onGoHome = {
                         navController.navigate("home") {
                             popUpTo(navController.graph.startDestinationId) { inclusive = true }
