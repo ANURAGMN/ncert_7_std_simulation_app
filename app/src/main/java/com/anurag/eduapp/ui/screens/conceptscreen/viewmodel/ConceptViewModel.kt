@@ -9,11 +9,12 @@ import com.anurag.eduapp.repository.ChapterRepository
 import com.anurag.eduapp.repository.ConceptRepository
 import com.anurag.eduapp.repository.StudentLocalRepository
 import com.anurag.eduapp.repository.SubjectRepository
-import com.anurag.eduapp.ui.models.ConceptStatus
+import com.anurag.eduapp.data.model.ProgressStatus
 import com.anurag.eduapp.ui.models.ConceptUiModel
-import com.anurag.eduapp.ui.models.ChapterProgressUiModel
 import com.anurag.eduapp.ui.screens.conceptscreen.dataclass.ConceptScreenState
 import com.anurag.eduapp.utils.getLocalizedName
+import com.anurag.eduapp.utils.buildProgressUiModel
+import com.anurag.eduapp.utils.isKannada
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,8 +25,6 @@ import kotlin.collections.count
 import kotlin.collections.isNotEmpty
 import kotlin.collections.mapIndexed
 import kotlin.let
-import kotlin.ranges.coerceAtLeast
-import kotlin.ranges.coerceIn
 
 @HiltViewModel
 class ConceptViewModel @Inject constructor(
@@ -73,25 +72,36 @@ class ConceptViewModel @Inject constructor(
                         } else null
                     )
 
+                    val progressStatus = when (status) {
+                        "COMPLETED" -> ProgressStatus.COMPLETED
+                        "IN_PROGRESS", "STARTED" -> ProgressStatus.IN_PROGRESS
+                        else -> ProgressStatus.NOT_STARTED
+                    }
+
+                    // Compute other properties in ViewModel
+                    val isSimulation = concept.type.equals("SIMULATION", ignoreCase = true)
+                    val simulationButtonUrl = getSelectedSimulationUrl(
+                        concept.simulationUrl,
+                        concept.simulationUrlKannada
+                    )
+
                     ConceptUiModel(
                         id = concept.conceptId,
                         name = concept.getLocalizedName(),
                         order = concept.orderIndex,
-                        status = when (status) {
-                            "COMPLETED" -> ConceptStatus.COMPLETED
-                            "IN_PROGRESS", "STARTED" -> ConceptStatus.IN_PROGRESS
-                            else -> ConceptStatus.NOT_STARTED
-                        },
+                        status = progressStatus,
                         type = concept.type,
                         simulationUrl = concept.simulationUrl,
                         simulationUrlKannada = concept.simulationUrlKannada,
-                        simulationId = concept.simulationId
+                        simulationId = concept.simulationId,
+                        isSimulation = isSimulation,
+                        simulationButtonUrl = simulationButtonUrl
                     )
                 }
 
                 // Auto-unlock first concept if not started
                 if (conceptUiModels.isNotEmpty() &&
-                    conceptUiModels[0].status == ConceptStatus.NOT_STARTED) {
+                    conceptUiModels[0].status == ProgressStatus.NOT_STARTED) {
                     unlockFirstConcept(studentId, conceptUiModels[0].id)
                 }
 
@@ -103,7 +113,7 @@ class ConceptViewModel @Inject constructor(
                 }
 
                 // Count completed visible concepts
-                val completedCount = visibleConcepts.count { it.status == ConceptStatus.COMPLETED }
+                val completedCount = visibleConcepts.count { it.status == ProgressStatus.COMPLETED }
                 val totalCount = visibleConcepts.size  // Only visible concepts
 
                 // Log for debugging - shows actual visible count
@@ -207,21 +217,23 @@ class ConceptViewModel @Inject constructor(
     }
 
     /**
-     * ChapterProgressUiModel with all calculated progress data
+     * Selects the appropriate simulation URL based on device language preference
+     * Prioritizes Kannada URL if available and device language is Kannada, otherwise uses English URL
      */
-    private fun buildProgressUiModel(
-        completed: Int,
-        total: Int
-    ): ChapterProgressUiModel {
-        val safeTotal = total.coerceAtLeast(1)
-        val fraction = completed.toFloat() / safeTotal
+    private fun getSelectedSimulationUrl(
+        englishUrl: String?,
+        kannadaUrl: String?
+    ): String? {
+        // Select URL based on current app language
+        val selectedUrl = if (isKannada()) {
+            // Use Kannada URL if available, fallback to English URL
+            kannadaUrl?.takeIf { it.isNotBlank() } ?: englishUrl
+        } else {
+            // Use English URL
+            englishUrl
+        }
 
-        return ChapterProgressUiModel(
-            completed = completed,
-            total = total,
-            progressFraction = fraction.coerceIn(0f, 1f),
-            progressPercentage = (fraction * 100).toInt(),
-            remaining = (total - completed).coerceAtLeast(0)
-        )
+        // Validate URL is not empty or placeholder
+        return selectedUrl?.takeIf { it.isNotBlank() && it != "Not found" }
     }
 }

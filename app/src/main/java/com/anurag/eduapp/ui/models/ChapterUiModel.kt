@@ -1,5 +1,6 @@
 package com.anurag.eduapp.ui.models
 
+import com.anurag.eduapp.data.model.ProgressStatus
 /**
  * UI Model for Chapter data
  */
@@ -10,15 +11,7 @@ data class ChapterUiModel(
     val orderIndex:Int,
     val totalConcepts: Int,
     val completedConcepts: Int,
-    val status: ChapterStatus
+    val status: ProgressStatus,
+    val progressUiModel: ChapterProgressUiModel? = null
 )
-
-/**
- * Chapter completion status for UI
- */
-enum class ChapterStatus {
-    COMPLETED,
-    IN_PROGRESS,
-    NOT_STARTED
-}
 

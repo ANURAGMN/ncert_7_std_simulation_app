@@ -50,6 +50,10 @@ class GoogleSignIn {
                                 val googleIdTokenCredential =
                                     GoogleIdTokenCredential.createFrom(result.credential.data)
 
+                                // Log the Google ID Token for backend verification
+                                val idToken = googleIdTokenCredential.idToken
+                                DebugLogger.debugLog("GoogleSignIn", "Google ID Token: $idToken")
+
                                 val user: User =
                                     GoogleInfoExtractor.extractAndLogUserInfo(googleIdTokenCredential)
 

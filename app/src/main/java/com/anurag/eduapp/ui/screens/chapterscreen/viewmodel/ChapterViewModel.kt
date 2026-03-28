@@ -6,10 +6,11 @@ import com.anurag.eduapp.data.local.SharedPreferenceUtils
 import com.anurag.eduapp.repository.ChapterRepository
 import com.anurag.eduapp.repository.StudentLocalRepository
 import com.anurag.eduapp.repository.SubjectRepository
-import com.anurag.eduapp.ui.models.ChapterStatus
+import com.anurag.eduapp.data.model.ProgressStatus
 import com.anurag.eduapp.ui.models.ChapterUiModel
 import com.anurag.eduapp.ui.screens.chapterscreen.dataclass.ChapterUiState
 import com.anurag.eduapp.utils.getLocalizedName
+import com.anurag.eduapp.utils.buildProgressUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -59,11 +60,17 @@ class ChapterViewModel @Inject constructor(
 
                     // Determine status based on completion
                     val status = when {
-                        totalConcepts == 0 -> ChapterStatus.NOT_STARTED
-                        completedConcepts == 0 -> ChapterStatus.NOT_STARTED
-                        completedConcepts >= totalConcepts -> ChapterStatus.COMPLETED
-                        else -> ChapterStatus.IN_PROGRESS
+                        totalConcepts == 0 -> ProgressStatus.NOT_STARTED
+                        completedConcepts == 0 -> ProgressStatus.NOT_STARTED
+                        completedConcepts >= totalConcepts -> ProgressStatus.COMPLETED
+                        else -> ProgressStatus.IN_PROGRESS
                     }
+
+                    // Compute progress UI model
+                    val progressUiModel = buildProgressUiModel(
+                        completed = completedConcepts,
+                        total = totalConcepts
+                    )
 
                     ChapterUiModel(
                         id = chapter.chapterId,
@@ -72,7 +79,8 @@ class ChapterViewModel @Inject constructor(
                         englishName = chapter.chapterName,  // API name (always English)
                         totalConcepts = totalConcepts,
                         completedConcepts = completedConcepts,
-                        status = status
+                        status = status,
+                        progressUiModel = progressUiModel
                     )
                 }
 

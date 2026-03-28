@@ -29,22 +29,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.anurag.eduapp.R
-import com.anurag.eduapp.ui.models.ChapterStatus
+import com.anurag.eduapp.data.model.ProgressStatus
 import com.anurag.eduapp.ui.models.ChapterUiModel
+import com.anurag.eduapp.ui.models.ChapterProgressUiModel
 import com.anurag.eduapp.ui.theme.CardBackground
 import com.anurag.eduapp.ui.theme.ColorHint
 import com.anurag.eduapp.ui.theme.CompleteTextColor
-import com.anurag.eduapp.ui.theme.HeaderGradientStart
 import com.anurag.eduapp.ui.theme.InProgressTextColor
 import com.anurag.eduapp.ui.theme.LocalDimensions
 import com.anurag.eduapp.ui.theme.TextPrimary
 import com.anurag.eduapp.ui.theme.TextSecondary
-import kotlin.compareTo
-import kotlin.text.toFloat
-import kotlin.toString
 
 
 /**
@@ -53,7 +49,7 @@ import kotlin.toString
  * 2. Status Badge (Completed, In Progress)
  * 3. Progress Bar showing completion percentage
  * 4. Action Buttons: Study, Simulations
- *
+
  * @param chapter The chapter UI model to display.
  * @param onStudyClick Callback when the "Study" button is clicked.
  * @param onSimulationClick Callback when the "Simulation" button is clicked.
@@ -68,6 +64,8 @@ fun ChapterCard(
     subjectName: String = ""
 ) {
     val dimens = LocalDimensions.current
+    val progress = chapter.progressUiModel
+        ?: throw IllegalStateException("ChapterProgressUiModel must be provided by ViewModel")
 
     Box(
         modifier = modifier
@@ -75,7 +73,7 @@ fun ChapterCard(
             .padding(dimens.cardPadding)
     ) {
         // Status Badge - positioned above the card
-        if (chapter.status != ChapterStatus.NOT_STARTED) {
+        if (chapter.status != ProgressStatus.NOT_STARTED) {
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -83,16 +81,15 @@ fun ChapterCard(
                     .zIndex(1f)
                     .background(
                         color = getChapterStatusColor(chapter.status),
-                        shape = RoundedCornerShape(4.dp)
+                        shape = RoundedCornerShape(dimens.cornerRadiusSmall)
                     )
-                    .padding(horizontal = 12.dp, vertical = 6.dp)
+                    .padding(horizontal = dimens.statusTextBoxHorizontalPadding, vertical = dimens.statusTextBoxVerticalPadding)
             ) {
                 Text(
                     text = getChapterStatusText(chapter.status),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
-                    fontSize = 11.sp
                 )
             }
         }
@@ -111,7 +108,7 @@ fun ChapterCard(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(dimens.spaceMedium)
             ) {
                 // Chapter Order + name
                 Row(
@@ -158,31 +155,30 @@ fun ChapterCard(
                         // Progress Bar with percentage
                         Column(
                             modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                            verticalArrangement = Arrangement.spacedBy(dimens.spaceExtraSmall)
                         ) {
                             // Progress bar
                             LinearProgressIndicator(
-                                progress = {
-                                    if (chapter.totalConcepts > 0) {
-                                        chapter.completedConcepts.toFloat() / chapter.totalConcepts
-                                    } else {
-                                        0f
-                                    }
-                                },
+                                progress = { progress.progressFraction },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(6.dp)
-                                    .clip(RoundedCornerShape(3.dp)),
+                                    .height(dimens.progressIndicatorStrokeHeight)
+                                    .clip(RoundedCornerShape(dimens.cornerRadiusSmall)),
                                 trackColor = ColorHint,
                                 color = getProgressBarColor(chapter.status)
                             )
 
                             // Progress text
                             Text(
-                                text = "${chapter.completedConcepts}/${chapter.totalConcepts} concepts completed",
+                                text = stringResource(
+                                    R.string.progress_status,
+                                    progress.completed,
+                                    progress.total,
+                                    progress.remaining
+                                ),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = TextSecondary,
-                                fontSize = 10.sp
+                                fontWeight = FontWeight.Bold
                             )
                         }
 
@@ -221,22 +217,25 @@ fun ChapterCard(
 
 // Helper functions for status badge
 @Composable
-private fun getChapterStatusText(status: ChapterStatus): String = when (status) {
-    ChapterStatus.COMPLETED -> stringResource(R.string.status_completed)
-    ChapterStatus.IN_PROGRESS -> stringResource(R.string.status_in_progress)
-    ChapterStatus.NOT_STARTED -> stringResource(R.string.status_not_started)
+private fun getChapterStatusText(status: ProgressStatus): String = when (status) {
+    ProgressStatus.COMPLETED -> stringResource(R.string.status_completed)
+    ProgressStatus.IN_PROGRESS -> stringResource(R.string.status_in_progress)
+    ProgressStatus.NOT_STARTED -> stringResource(R.string.status_not_started)
+    ProgressStatus.LOCKED -> stringResource(R.string.status_not_started)
 }
 
-private fun getChapterStatusColor(status: ChapterStatus): Color = when (status) {
-    ChapterStatus.COMPLETED -> CompleteTextColor
-    ChapterStatus.IN_PROGRESS -> InProgressTextColor
-    ChapterStatus.NOT_STARTED -> Color.Gray
+private fun getChapterStatusColor(status: ProgressStatus): Color = when (status) {
+    ProgressStatus.COMPLETED -> CompleteTextColor
+    ProgressStatus.IN_PROGRESS -> InProgressTextColor
+    ProgressStatus.NOT_STARTED -> Color.Gray
+    ProgressStatus.LOCKED -> Color.Gray
 }
 
-private fun getProgressBarColor(status: ChapterStatus): Color = when (status) {
-    ChapterStatus.COMPLETED -> CompleteTextColor
-    ChapterStatus.IN_PROGRESS -> InProgressTextColor
-    ChapterStatus.NOT_STARTED -> Color.Gray
+private fun getProgressBarColor(status: ProgressStatus): Color = when (status) {
+    ProgressStatus.COMPLETED -> CompleteTextColor
+    ProgressStatus.IN_PROGRESS -> InProgressTextColor
+    ProgressStatus.NOT_STARTED -> Color.Gray
+    ProgressStatus.LOCKED -> Color.Gray
 }
 
 @Preview
@@ -245,12 +244,19 @@ fun ChapterCardPreview() {
     ChapterCard(
         chapter = ChapterUiModel(
             id = "1",
-            orderIndex =1,
+            orderIndex = 1,
             name = "Number Systems",
             englishName = "Number Systems",
             totalConcepts = 8,
             completedConcepts = 5,
-            status = ChapterStatus.IN_PROGRESS
+            status = ProgressStatus.IN_PROGRESS,
+            progressUiModel = ChapterProgressUiModel(
+                completed = 5,
+                total = 8,
+                progressFraction = 5f / 8f,
+                progressPercentage = 62,
+                remaining = 3
+            )
         )
     )
 }

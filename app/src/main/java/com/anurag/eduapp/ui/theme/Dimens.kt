@@ -29,6 +29,9 @@ data class Dimensions(
     val messageVerticalPadding: Dp,
     val messageMaxWidth: Float,
     val userMessageMaxWidth: Dp,
+    val statusTextBoxHorizontalPadding: Dp,
+    val statusTextBoxVerticalPadding: Dp,
+
 
     // Avatar
     val avatarSize: Dp,
@@ -96,6 +99,8 @@ data class Dimensions(
 
     // Progress Indicator
     val progressIndicatorStrokeWidth: Dp,
+    val progressIndicatorStrokeHeight: Dp,
+
     val timerLength: Dp
 ) {
     companion object {
@@ -180,7 +185,12 @@ data class Dimensions(
 
             // Progress Indicator
             progressIndicatorStrokeWidth = 4.dp,
-            timerLength= 60.dp
+            timerLength= 60.dp,
+
+            statusTextBoxHorizontalPadding =12.dp,
+            statusTextBoxVerticalPadding = 6.dp,
+
+            progressIndicatorStrokeHeight =6.dp
         )
 
         val Medium = Dimensions(
@@ -262,7 +272,13 @@ data class Dimensions(
             weeklyActivityCardHeight = 140.dp,
             // Progress Indicator
             progressIndicatorStrokeWidth = 6.dp,
-            timerLength= 64.dp
+            timerLength= 64.dp,
+
+            statusTextBoxHorizontalPadding =16.dp,
+            statusTextBoxVerticalPadding =12.dp,
+
+            progressIndicatorStrokeHeight =8.dp
+
         )
 
         val Expanded = Dimensions(
@@ -347,7 +363,13 @@ data class Dimensions(
             weeklyActivityCardHeight = 160.dp,
             //progress indicator
             progressIndicatorStrokeWidth = 8.dp,
-            timerLength= 68.dp
+            timerLength= 68.dp,
+
+            statusTextBoxHorizontalPadding =18.dp,
+            statusTextBoxVerticalPadding =16.dp,
+
+            progressIndicatorStrokeHeight =8.dp
+
         )
     }
 }

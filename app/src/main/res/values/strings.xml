@@ -190,7 +190,7 @@
     <string name="ncert">NCERT Curriculum</string>
     <string name="my_progress">My Progress</string>
     <string name="chapter_progress">Chapter Progress</string>
-    <string name="progress_status">%1$d of %2$d • %3$d left</string>
+    <string name="progress_status">%1$d of %2$d . %3$d left</string>
     <string name="progress">Progress</string>
     <string name="study">Study</string>
     <string name="select_chapter">Select Chapter</string>

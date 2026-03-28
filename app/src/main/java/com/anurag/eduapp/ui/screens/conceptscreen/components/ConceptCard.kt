@@ -7,14 +7,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,7 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.anurag.eduapp.R
-import com.anurag.eduapp.ui.models.ConceptStatus
+import com.anurag.eduapp.data.model.ProgressStatus
 import com.anurag.eduapp.ui.models.ConceptUiModel
 import com.anurag.eduapp.ui.theme.AccentBlue
 import com.anurag.eduapp.ui.theme.CardBackground
@@ -34,22 +30,22 @@ import com.anurag.eduapp.ui.theme.InProgressTextColor
 import com.anurag.eduapp.ui.theme.LocalDimensions
 import com.anurag.eduapp.ui.theme.NotStartedTextColor
 import com.anurag.eduapp.ui.theme.TextPrimary
-import com.anurag.eduapp.ui.theme.TextSecondary
 import com.anurag.eduapp.ui.theme.White
- import com.anurag.eduapp.utils.isKannada
 
 /**
  * Composable function to display a Concept Card with status badge, title, concept completion status, and an icon.
  *
- * @param concept The Concept data to display.
+ * @param concept The Concept UI data to display.
+ * @param serialNumber The order number of the concept.
  * @param onClick Lambda function to handle card click events.
+ * @param onSimulationClick Lambda function to handle simulation button clicks with concept name and URL.
  */
 @Composable
 fun ConceptCard(
     concept: ConceptUiModel,
     serialNumber: Int = 1,
     onClick: () -> Unit = {},
-    onSimulationClick: (String,String) -> Unit = { _,_ -> }
+    onSimulationClick: (String, String) -> Unit = { _, _ -> }
 ) {
     val dimens = LocalDimensions.current
 
@@ -58,13 +54,13 @@ fun ConceptCard(
             .fillMaxWidth()
             .clickable(onClick = onClick),
         shape = CardDefaults.shape,
-        colors =CardDefaults.cardColors(
+        colors = CardDefaults.cardColors(
             containerColor = CardBackground,
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = dimens.cardElevation,
         )
-    ){
+    ) {
         // Left side: Badge + Content
         Row(
             modifier = Modifier
@@ -82,7 +78,7 @@ fun ConceptCard(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal =dimens.inputHorizontalPadding),
+                    .padding(horizontal = dimens.inputHorizontalPadding),
                 verticalArrangement = Arrangement.spacedBy(dimens.spaceSmall)
             ) {
                 // Title
@@ -93,82 +89,56 @@ fun ConceptCard(
                     color = TextPrimary
                 )
 
-                // Concept Completion status
+                // Concept Completion status - pre-computed in ViewModel
                 Text(
-                    text = getStatus(concept.status),
+                    text = stringResource(concept.statusTextResId),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Medium,
                     color = getStatusColor(concept.status)
                 )
 
-                // Simulation Buttons
-                if (concept.type.equals("SIMULATION", ignoreCase = true)) {
+                // Simulation Button
+                if (concept.isSimulation && !concept.simulationButtonUrl.isNullOrBlank()) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = dimens.spaceSmall),
                         horizontalArrangement = Arrangement.spacedBy(dimens.spaceSmall)
                     ) {
-                        // Select URL based on current app language
-                        val selectedUrl = if (isKannada()) {
-                            // Use Kannada URL if available, fallback to English URL
-                            concept.simulationUrlKannada?.takeIf { it.isNotBlank() }
-                                ?: concept.simulationUrl
-                        } else {
-                            // Use English URL
-                            concept.simulationUrl
-                        }
-
-                        val hasValidUrl = !selectedUrl.isNullOrBlank() && selectedUrl != "Not found"
-
-                        if (hasValidUrl) {
-                            Button(
-                                onClick = {
-                                    onSimulationClick(concept.name, selectedUrl)
-                                },
+                        Button(
+                            onClick = {
+                                onSimulationClick(concept.name, concept.simulationButtonUrl)
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            contentPadding = PaddingValues(horizontal = dimens.spaceExtraSmall),
+                            shape = MaterialTheme.shapes.small,
+                            colors = buttonColors(
+                                containerColor = AccentBlue,
+                                contentColor = TextPrimary
+                            )
+                        ) {
+                            Text(
+                                text = stringResource(R.string.simulation),
+                                textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.labelSmall,
                                 modifier = Modifier.fillMaxWidth(),
-                                contentPadding = PaddingValues(horizontal = dimens.spaceExtraSmall),
-                                shape = MaterialTheme.shapes.small,
-                                colors = buttonColors(
-                                    containerColor = AccentBlue,
-                                    contentColor = TextPrimary
-                                )
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.simulation),
-                                    textAlign = TextAlign.Center,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    modifier = Modifier.fillMaxWidth(),
-                                    color = White
-                                )
-                            }
+                                color = White
+                            )
                         }
                     }
                 }
             }
-
-
-            // Right side: Chevron or Lock icon
-            Icon(
-                imageVector = Icons.Default.ChevronRight,
-                contentDescription = stringResource(R.string.open_concept),
-                tint = TextSecondary ,
-                modifier = Modifier.size(dimens.iconLarge)
-            )
         }
     }
 }
 
-// Helper Functions for Status Texts and Colors
-@Composable
-private fun getStatus(status: ConceptStatus): String = when (status) {
-    ConceptStatus.COMPLETED -> stringResource(R.string.completed)
-    ConceptStatus.IN_PROGRESS -> stringResource(R.string.in_progress_continue_learning)
-    ConceptStatus.NOT_STARTED -> stringResource(R.string.complete_previous_concepts)
-}
-
-private fun getStatusColor(status: ConceptStatus): Color = when (status) {
-    ConceptStatus.COMPLETED -> CompleteTextColor
-    ConceptStatus.IN_PROGRESS -> InProgressTextColor
-    ConceptStatus.NOT_STARTED -> NotStartedTextColor
+/**
+ * Maps ProgressStatus to its corresponding UI color
+ * This is a pure UI utility function with no side effects
+ */
+private fun getStatusColor(status: ProgressStatus): Color = when (status) {
+    ProgressStatus.COMPLETED -> CompleteTextColor
+    ProgressStatus.IN_PROGRESS -> InProgressTextColor
+    ProgressStatus.NOT_STARTED -> NotStartedTextColor
+    ProgressStatus.LOCKED -> NotStartedTextColor
 }

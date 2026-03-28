@@ -17,14 +17,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.anurag.eduapp.R
 import com.anurag.eduapp.data.local.entities.ConceptEntity
-import com.anurag.eduapp.ui.models.ConceptStatus
+import com.anurag.eduapp.data.local.entities.ProgressEntity
+import com.anurag.eduapp.data.model.ProgressStatus
 import com.anurag.eduapp.ui.models.ConceptUiModel
 import com.anurag.eduapp.ui.screens.conceptscreen.components.ConceptCard
 import com.anurag.eduapp.ui.theme.BackgroundPrimary
 import com.anurag.eduapp.ui.theme.LocalDimensions
 import com.anurag.eduapp.ui.theme.TextPrimary
 import com.anurag.eduapp.utils.getLocalizedName
-import com.anurag.eduapp.data.local.entities.ProgressEntity
+import com.anurag.eduapp.utils.isKannada
 
 @Composable
 fun PracticeSimulationCard(
@@ -67,19 +68,36 @@ fun PracticeSimulationCard(
 
                 filteredSimulations.forEachIndexed { index, (progress, concept) ->
                     concept?.let { sim ->
+                        // Determine status from progress entity
+                        val status = when (progress?.status) {
+                            "COMPLETED" -> ProgressStatus.COMPLETED
+                            "IN_PROGRESS", "STARTED" -> ProgressStatus.IN_PROGRESS
+                            else -> ProgressStatus.NOT_STARTED
+                        }
+
+                        // Select simulation URL based on language preference
+                        val selectedSimulationUrl = if (isKannada()) {
+                            sim.simulationUrlKannada?.takeIf { it.isNotBlank() && it != "Not found" }
+                                ?: sim.simulationUrl
+                        } else {
+                            sim.simulationUrl
+                        }
+
+                        // Validate URL
+                        val hasValidUrl = !selectedSimulationUrl.isNullOrBlank() && selectedSimulationUrl != "Not found"
+                        val isSimulation = sim.type.equals("SIMULATION", ignoreCase = true)
+
                         val conceptUiModel = ConceptUiModel(
                             id = sim.conceptId,
                             name = sim.getLocalizedName(),
                             order = sim.orderIndex,
-                            status = when (progress?.status) {
-                                "COMPLETED" -> ConceptStatus.COMPLETED
-                                "IN_PROGRESS" -> ConceptStatus.IN_PROGRESS
-                                else -> ConceptStatus.NOT_STARTED
-                            },
+                            status = status,
                             type = sim.type,
                             simulationUrl = sim.simulationUrl,
                             simulationUrlKannada = sim.simulationUrlKannada,
-                            simulationId = sim.simulationId
+                            simulationId = sim.simulationId,
+                            isSimulation = isSimulation,
+                            simulationButtonUrl = if (hasValidUrl) selectedSimulationUrl else null
                         )
 
                         ConceptCard(
