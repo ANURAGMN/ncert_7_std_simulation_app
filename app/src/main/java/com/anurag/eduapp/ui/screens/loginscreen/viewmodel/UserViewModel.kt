@@ -26,7 +26,6 @@ import kotlin.text.orEmpty
 class UserViewModel @Inject constructor(
     private val repo: FirebaseRepository,
     private val sharedPreferenceUtils: SharedPreferenceUtils,
-    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
 

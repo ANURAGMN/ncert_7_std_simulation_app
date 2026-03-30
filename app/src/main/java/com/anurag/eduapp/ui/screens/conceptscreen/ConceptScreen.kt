@@ -40,7 +40,8 @@ import com.anurag.eduapp.utils.StreakManager
  * chapterId: ID of the chapter whose concepts are to be displayed.
  * type: Type of concepts to load (STUDY or SIMULATION).
  * onBackClick: Lambda function to handle back navigation.
- * onConceptClick: Lambda function to handle concept item clicks.
+ * onGoHome: Lambda function to navigate to home screen.
+ * onGoSetting: Lambda function to navigate to settings screen.
  *
  * loads concepts from the database using ConceptViewModel and displays them in a list.
  */

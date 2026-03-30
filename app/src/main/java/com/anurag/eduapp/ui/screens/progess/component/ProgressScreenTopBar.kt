@@ -65,7 +65,7 @@ fun ProgressScreenTopBar(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(0.dp, dimes.spaceSmall)
+                .padding(vertical= dimes.spaceSmall)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,

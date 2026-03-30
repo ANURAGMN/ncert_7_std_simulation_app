@@ -52,8 +52,6 @@ fun HomeScreen(
     val progressSimulations by viewModel.progressSimulations.collectAsState()
 
     val streakCount by viewModel.streakCount.collectAsState()
-    val todayCompletedConceptCount by viewModel.todayConceptCount.collectAsState()
-    val todayCompletedSimulationCount by viewModel.todaySimulationCount.collectAsState()
     val student by viewModel.student.collectAsState()
     val greeting by viewModel.greeting.collectAsState()
 
@@ -91,7 +89,7 @@ fun HomeScreen(
                 )
             } else {
                 HomeScreenTopBar(
-                    userName = student?.studentName ?: "John Doe",
+                    userName = student?.studentName ?: "Student",
                     subject = selectedSubject ?: "Science",
                     streakDays = streakCount,
                     greeting = greeting,
@@ -100,16 +98,6 @@ fun HomeScreen(
             }
 
             Column(modifier = Modifier.padding(dimens.screenPadding)) {
-//                TodayProgressCard(
-//                    progressConcepts = progressConcepts,
-//                    onLessonClick = onLessonClick,
-//                    todayCompletedConcept = todayCompletedConceptCount,
-//                    todayCompletedSimulation = todayCompletedSimulationCount,
-//                    onShowAllChapters = {
-//                        val subjectId = sharedPreferenceUtils.getSubjectSelection() ?: "science"
-//                        onNavigateToChapters(subjectId)
-//                    }
-//                )
                 Spacer(modifier = Modifier.height(dimens.spaceSmall))
                 PracticeSimulationCard(
                     progressSimulations = progressSimulations,

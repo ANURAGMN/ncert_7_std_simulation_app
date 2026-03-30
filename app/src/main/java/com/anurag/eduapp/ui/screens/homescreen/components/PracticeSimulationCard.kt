@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.anurag.eduapp.R
 import com.anurag.eduapp.data.local.entities.ConceptEntity
 import com.anurag.eduapp.data.local.entities.ProgressEntity
@@ -48,7 +47,8 @@ fun PracticeSimulationCard(
                 style = MaterialTheme.typography.titleLarge,
                 color = TextPrimary,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.fillMaxWidth().padding(0.dp, dimes.spaceExtraSmall)
+                modifier = Modifier.fillMaxWidth()
+                    .padding(vertical = dimes.spaceExtraSmall)
             )
             Spacer(modifier = Modifier.height(dimes.screenPadding))
 

@@ -48,7 +48,7 @@ fun StreakCard(days: Int, modifier: Modifier = Modifier) {
     ) {
         Icon(
             imageVector = Icons.Outlined.LocalFireDepartment,
-            contentDescription = "Fire Icon",
+            contentDescription = stringResource(R.string.fire_icon),
             tint = White,
             modifier = Modifier.size(dimes.iconLarge)
         )
@@ -66,7 +66,7 @@ fun StreakCard(days: Int, modifier: Modifier = Modifier) {
 
         Icon(
             imageVector = Icons.Outlined.EmojiEvents,
-            contentDescription = "Trophy Icon",
+            contentDescription = stringResource(R.string.trophy_icon),
             tint = White,
             modifier = Modifier.size(dimes.iconLarge)
         )

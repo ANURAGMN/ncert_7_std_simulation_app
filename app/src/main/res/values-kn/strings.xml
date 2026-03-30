@@ -316,4 +316,6 @@
     <string name="success">ಯಶಸ್ಸು</string>
     <string name="retry">ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ</string>
     <string name="ok">ಸರಿ</string>
+    <string name="arrow_icon">arrow icon</string>
+    <string name="trophy_icon">Trophy Icon</string>
 </resources>

@@ -12,6 +12,7 @@ import com.anurag.eduapp.service.analytics.SessionManager
 import com.anurag.eduapp.service.sync.WeeklySyncWorker
 import com.anurag.eduapp.utils.AppLifecycleObserver
 import com.anurag.eduapp.utils.LanguageHelper
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

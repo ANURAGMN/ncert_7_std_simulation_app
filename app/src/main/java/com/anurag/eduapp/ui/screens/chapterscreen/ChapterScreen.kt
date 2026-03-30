@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.anurag.eduapp.R
-import com.anurag.eduapp.debug.DebugLogger
 import com.anurag.eduapp.service.analytics.ScreenName
 import com.anurag.eduapp.service.analytics.TrackScreenEvent
 import com.anurag.eduapp.ui.screens.chapterscreen.components.ChapterCard
@@ -72,7 +71,6 @@ fun ChapterScreen(
                 CircularProgressIndicator()
             }
         } else if (state.error != null) {
-            DebugLogger.errorLog("ChapterScreen", "Error loading chapters: ${state.error}")
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center

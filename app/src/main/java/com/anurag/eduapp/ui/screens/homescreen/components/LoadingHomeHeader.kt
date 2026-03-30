@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.anurag.eduapp.R
 import com.anurag.eduapp.ui.theme.BrandPrimary
 import com.anurag.eduapp.ui.theme.HeaderGradientEnd
@@ -30,7 +29,7 @@ fun LoadingHomeHeader(
     subject: String,
     onChangeSubject: () -> Unit = {}
 ) {
-    val dimes = LocalDimensions.current
+    val dimens = LocalDimensions.current
     Box(
         modifier =
             Modifier.fillMaxWidth()
@@ -45,13 +44,13 @@ fun LoadingHomeHeader(
                         ),
                     shape =
                         RoundedCornerShape(
-                            bottomStart = dimes.cornerRadiusRound,
-                            bottomEnd = dimes.cornerRadiusRound
+                            bottomStart = dimens.cornerRadiusRound,
+                            bottomEnd = dimens.cornerRadiusRound
                         )
                 )
-                .padding(dimes.screenPadding)
+                .padding(dimens.screenPadding)
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(dimes.spaceSmall)) {
+        Column(verticalArrangement = Arrangement.spacedBy(dimens.spaceSmall)) {
             Text(
                 text = stringResource(R.string.good_morning),
                 color = TextPrimary,
@@ -70,7 +69,7 @@ fun LoadingHomeHeader(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(80.dp)
+                    .height(dimens.boxSizeMedium)
                     .background(
                         brush = Brush.horizontalGradient(
                             listOf(
@@ -78,7 +77,7 @@ fun LoadingHomeHeader(
                                 HeaderGradientEnd.copy(alpha = 0.5f)
                             )
                         ),
-                        shape = RoundedCornerShape(dimes.cornerRadiusRound)
+                        shape = RoundedCornerShape(dimens.cornerRadiusRound)
                     ),
                 contentAlignment = Alignment.Center
             ) {

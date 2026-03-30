@@ -54,7 +54,7 @@ fun HomeScreenSubjectCard(
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Default.MenuBook,
-            contentDescription = "Book Icon",
+            contentDescription = stringResource(R.string.book_icon),
             tint = White,
             modifier = Modifier.size(dimes.iconLarge)
         )
@@ -78,7 +78,7 @@ fun HomeScreenSubjectCard(
             Text(text = stringResource(R.string.change), color = White.copy(alpha = 0.7f))
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = null,
+                contentDescription = stringResource(R.string.arrow_icon),
                 tint = White.copy(alpha = 0.7f)
             )
         }

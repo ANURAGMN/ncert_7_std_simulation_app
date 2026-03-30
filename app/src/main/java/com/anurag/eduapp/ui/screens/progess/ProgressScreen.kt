@@ -48,7 +48,6 @@ fun ProgressScreen(
     val viewModel: ProgressScreenViewModel = hiltViewModel()
 
     // Collect all state from ViewModel
-    val totalCompletedConcept by viewModel.totalCompletedConcept.collectAsState()
     val totalCompletedSimulations by viewModel.totalCompletedSimulations.collectAsState()
     val streakCount by viewModel.streakCount.collectAsState()
     val weeklyProgressData by viewModel.weeklyProgressData.collectAsState()

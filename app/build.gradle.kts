@@ -1,13 +1,14 @@
 import java.util.Properties
 import kotlin.apply
 
- plugins {
+plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.services)
     id("kotlin-parcelize")
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.kotlin.android)
 }
 
@@ -91,6 +92,7 @@ dependencies {
     // Firebase Libraries
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.crashlytics)
     implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
     // WorkManager
     implementation(libs.androidx.work.runtime.ktx)

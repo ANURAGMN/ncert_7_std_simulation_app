@@ -73,7 +73,7 @@ fun ChapterProgressCardOnHeader(
                 progress = { progress.progressFraction },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(8.dp)
+                    .height(dimens.progressIndicatorStrokeHeight)
                     .clip(RoundedCornerShape(dimens.cornerRadiusSmall)),
                 color = TextOnPrimary,
                 trackColor = TextOnPrimary.copy(alpha = 0.15f)
