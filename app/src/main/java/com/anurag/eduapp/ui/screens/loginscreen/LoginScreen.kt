@@ -1,7 +1,5 @@
 package com.anurag.eduapp.ui.screens.loginscreen
 
-import android.view.ViewGroup
-import android.widget.Button
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -33,15 +31,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.anurag.eduapp.R
 import com.anurag.eduapp.ui.screens.loginscreen.components.FooterCard
 import com.anurag.eduapp.ui.screens.loginscreen.components.GoogleLoginButton
 import com.anurag.eduapp.ui.screens.loginscreen.components.LanguageSelector
+import com.anurag.eduapp.ui.screens.loginscreen.components.UpdateAvailableDialog
+import com.anurag.eduapp.ui.screens.loginscreen.viewmodel.InAppUpdateViewModel
 import com.anurag.eduapp.ui.screens.loginscreen.viewmodel.UserViewModel
 import com.anurag.eduapp.ui.theme.BackgroundPrimary
 import com.anurag.eduapp.ui.theme.BackgroundSecondary
@@ -56,10 +56,11 @@ fun LoginScreen(
     userViewModel: UserViewModel
 ) {
     val dimens = LocalDimensions.current
-    val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
+    val updateViewModel: InAppUpdateViewModel = hiltViewModel()
 
     val selectedLanguage by userViewModel.selectedLanguage.collectAsState()
+    val updateState by updateViewModel.updateState.collectAsState()
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     // Show snackbar when error message is set
@@ -68,6 +69,12 @@ fun LoginScreen(
             snackbarHostState.showSnackbar(message)
             errorMessage = null // Clear after showing
         }
+    }
+
+    // Check for updates when screen is launched
+    LaunchedEffect(Unit) {
+        val activity = navController.context as? androidx.activity.ComponentActivity
+        activity?.let { updateViewModel.checkForUpdate(it) }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -191,6 +198,27 @@ fun LoginScreen(
                 contentColor = MaterialTheme.colorScheme.onErrorContainer,
                 actionColor = BrandPrimary,
                 shape = RoundedCornerShape(dimens.cornerRadiusMedium),
+            )
+        }
+
+        // Update Dialog - Positioned on top of all content
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .align(Alignment.Center),
+            contentAlignment = Alignment.Center
+        ) {
+            UpdateAvailableDialog(
+                isVisible = updateState.updateAvailable,
+                isDownloading = updateState.isDownloading,
+                downloadProgress = updateState.downloadProgress,
+                onUpdateClick = {
+                    val activity = navController.context as? androidx.activity.ComponentActivity
+                    activity?.let { updateViewModel.startUpdate(it) }
+                },
+                onDismissClick = {
+                    updateViewModel.dismissUpdate()
+                }
             )
         }
     }

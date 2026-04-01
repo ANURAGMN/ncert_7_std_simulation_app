@@ -104,4 +104,7 @@ dependencies {
     // Image Loading
     implementation(libs.glide)
     implementation(libs.glide.compose)
+
+    // Google Play In-App Update
+    implementation("com.google.android.play:app-update:2.1.0")
 }
