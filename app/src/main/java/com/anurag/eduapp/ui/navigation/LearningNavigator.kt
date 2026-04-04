@@ -17,7 +17,6 @@ object LearningRoutes {
     const val SUBJECTS = "subjects"
     const val CHAPTERS = "chapters/{subjectId}"
     const val CONCEPTS = "concepts/{chapterId}/{type}"
-    const val SIMULATION_VIEWER = "simulation_viewer/{simulationId}/{htmlFileName}/{simulationTitle}"
 }
 
 @Composable

@@ -6,8 +6,6 @@ import com.anurag.eduapp.data.model.ProgressStatus
 
 /**
  * UI Model for Concept data
- *
- * statusTextResId is computed from status - no need to pass it separately
  */
 data class ConceptUiModel(
     val id: String,

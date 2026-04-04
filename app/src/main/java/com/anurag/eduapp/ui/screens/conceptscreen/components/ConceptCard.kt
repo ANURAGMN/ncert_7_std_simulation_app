@@ -89,7 +89,7 @@ fun ConceptCard(
                     color = TextPrimary
                 )
 
-                // Concept Completion status - pre-computed in ViewModel
+                // Concept Completion status
                 Text(
                     text = stringResource(concept.statusTextResId),
                     style = MaterialTheme.typography.labelMedium,

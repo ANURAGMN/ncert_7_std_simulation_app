@@ -107,4 +107,7 @@ dependencies {
 
     // Google Play In-App Update
     implementation("com.google.android.play:app-update:2.1.0")
+
+    // Google Mobile Ads SDK
+    implementation("com.google.android.gms:play-services-ads:22.6.0")
 }

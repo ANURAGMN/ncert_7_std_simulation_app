@@ -38,6 +38,15 @@ class ConceptViewModel @Inject constructor(
     private val _state = MutableStateFlow(ConceptScreenState())
     val state: StateFlow<ConceptScreenState> = _state.asStateFlow()
 
+    private val _showAdBeforeSimulation = MutableStateFlow(false)
+    val showAdBeforeSimulation: StateFlow<Boolean> = _showAdBeforeSimulation.asStateFlow()
+
+    private val _simulationTitle = MutableStateFlow("")
+    val simulationTitle: StateFlow<String> = _simulationTitle.asStateFlow()
+
+    private val _simulationUrl = MutableStateFlow("")
+    val simulationUrl: StateFlow<String> = _simulationUrl.asStateFlow()
+    
     fun loadConcepts(chapterId: String, type: String) {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
@@ -221,6 +230,103 @@ class ConceptViewModel @Inject constructor(
                 DebugLogger.errorLog("ConceptViewModel", "❌ Error marking simulation completed: ${e.message} | ${e.stackTraceToString()}")
             }
         }
+    }
+
+    /**
+     * Check if ad should be shown before viewing a simulation
+     * Shows ad AFTER the first 3 simulations are completed
+     * 1st, 2nd, 3rd simulations = NO AD
+     * 4th simulation onwards = ALWAYS SHOW AD
+     * Returns true if ad should be shown before simulation
+     */
+    suspend fun shouldShowAdBeforeSimulation(): Boolean {
+        return try {
+            val studentId = sharedPrefs.getUserId() ?: ""
+            if (studentId.isEmpty()) return false
+
+            val totalCompleted = conceptRepository.getTotalCompletedSimulations(studentId)
+
+            // Show ad if user has completed 3 or more simulations (4th onwards)
+            // This means: 1st 3 simulations = no ad, 4th onwards = always show ad
+            val shouldShow = totalCompleted >= 3
+
+            DebugLogger.debugLog(
+                "ConceptViewModel",
+                "shouldShowAdBeforeSimulation: $shouldShow | Total simulations completed: $totalCompleted"
+            )
+
+            shouldShow
+        } catch (e: Exception) {
+            DebugLogger.errorLog("ConceptViewModel", "Error checking ad before simulation: ${e.message}")
+            false
+        }
+    }
+
+    /**
+     * Initialize ad display when entering simulation viewer
+     *
+     * @param conceptId The ID of the concept
+     * @param simulationUrl Optional pre-computed URL (if provided, skips state search)
+     * @param simulationTitle Optional title (if provided, uses this instead of searching state)
+     *
+     * If URL/title are not provided, searches in ViewModel state
+     * If provided, uses them directly (useful for PracticeSimulationCard which has data ready)
+     */
+    fun initializeSimulationWithAdCheck(
+        conceptId: String,
+        simulationUrl: String? = null,
+        simulationTitle: String? = null
+    ) {
+        viewModelScope.launch {
+            try {
+                if (simulationUrl != null && simulationTitle != null) {
+                    _simulationTitle.value = simulationTitle
+                    _simulationUrl.value = simulationUrl
+
+                    DebugLogger.debugLog(
+                        "ConceptViewModel",
+                        "initializeSimulationWithAdCheck (external data) for $conceptId: title=$simulationTitle, url=$simulationUrl"
+                    )
+                } else {
+                    val concept = _state.value.concepts.find { it.id == conceptId }
+                    _simulationTitle.value = concept?.name ?: "Simulation"
+
+                    if (concept == null) {
+                        DebugLogger.errorLog("ConceptViewModel", "Concept not found in state for ID: $conceptId")
+                        _simulationUrl.value = ""
+                        return@launch
+                    }
+
+                    val selectedUrl = getSelectedSimulationUrl(concept.simulationUrl,concept.simulationUrlKannada)
+                    _simulationUrl.value = selectedUrl ?: ""
+
+                    DebugLogger.debugLog(
+                        "ConceptViewModel",
+                        "initializeSimulationWithAdCheck (state search) for $conceptId: title=${_simulationTitle.value}, url=${_simulationUrl.value}"
+                    )
+                }
+
+                // Check if ad should be shown
+                val shouldShowAd = shouldShowAdBeforeSimulation()
+                _showAdBeforeSimulation.value = shouldShowAd
+
+                DebugLogger.debugLog(
+                    "ConceptViewModel",
+                    "Ad check result: shouldShowAd=$shouldShowAd"
+                )
+            } catch (e: Exception) {
+                DebugLogger.errorLog("ConceptViewModel", "Error initializing simulation ad: ${e.message} | ${e.stackTraceToString()}")
+                _showAdBeforeSimulation.value = false
+            }
+        }
+    }
+
+    /**
+     * Dismiss the ad and allow simulation to load
+     */
+    fun dismissAd() {
+        _showAdBeforeSimulation.value = false
+        DebugLogger.debugLog("ConceptViewModel", "Ad dismissed, showing simulation")
     }
 
     /**

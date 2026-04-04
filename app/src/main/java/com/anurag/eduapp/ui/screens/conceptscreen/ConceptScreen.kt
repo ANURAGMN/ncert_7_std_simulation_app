@@ -74,7 +74,6 @@ fun ConceptScreen(
     LaunchedEffect(chapterId, type) {
         viewModel.loadConcepts(chapterId, type)
     }
-
     Column(
         modifier = Modifier
             .fillMaxSize()

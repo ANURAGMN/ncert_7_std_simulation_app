@@ -57,4 +57,11 @@ class ConceptRepository(
     ) {
         progressDao.updateProgressStatus(studentId, itemType, itemId, newStatus, progressPercentage,timestamp)
     }
+
+    /**
+     * Gets the total number of completed simulations for a student
+     */
+    suspend fun getTotalCompletedSimulations(studentId: String): Int {
+        return progressDao.getTotalCompletedSimulations(studentId)
+    }
 }
