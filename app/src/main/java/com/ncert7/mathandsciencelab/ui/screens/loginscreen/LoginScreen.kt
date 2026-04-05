@@ -40,7 +40,6 @@ import com.ncert7.mathandsciencelab.R
 import com.ncert7.mathandsciencelab.ui.screens.loginscreen.components.FooterCard
 import com.ncert7.mathandsciencelab.ui.screens.loginscreen.components.GoogleLoginButton
 import com.ncert7.mathandsciencelab.ui.screens.loginscreen.components.LanguageSelector
-import com.ncert7.mathandsciencelab.ui.screens.loginscreen.components.UpdateAvailableDialog
 import com.ncert7.mathandsciencelab.ui.screens.loginscreen.viewmodel.InAppUpdateViewModel
 import com.ncert7.mathandsciencelab.ui.screens.loginscreen.viewmodel.UserViewModel
 import com.ncert7.mathandsciencelab.ui.theme.BackgroundPrimary
@@ -50,6 +49,18 @@ import com.ncert7.mathandsciencelab.ui.theme.LocalDimensions
 import com.ncert7.mathandsciencelab.ui.theme.TextPrimary
 import com.ncert7.mathandsciencelab.ui.theme.TextSecondary
 
+/**
+ * Login Screen
+ *
+ * Displays:
+ * - Language selector
+ * - Google sign-in button
+ * - Terms and privacy notice
+ *
+ * Auto-triggers:
+ * - In-app update check (Google's native popup will appear if update available)
+ * - Error messages for login failures
+ */
 @Composable
 fun LoginScreen(
     navController: NavController,
@@ -72,9 +83,12 @@ fun LoginScreen(
     }
 
     // Check for updates when screen is launched
+    // Google's native in-app update UI will appear automatically if update is available
     LaunchedEffect(Unit) {
         val activity = navController.context as? androidx.activity.ComponentActivity
-        activity?.let { updateViewModel.checkForUpdate(it) }
+        activity?.let {
+            updateViewModel.checkForUpdate(it)
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -201,25 +215,8 @@ fun LoginScreen(
             )
         }
 
-        // Update Dialog - Positioned on top of all content
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .align(Alignment.Center),
-            contentAlignment = Alignment.Center
-        ) {
-            UpdateAvailableDialog(
-                isVisible = updateState.updateAvailable,
-                isDownloading = updateState.isDownloading,
-                downloadProgress = updateState.downloadProgress,
-                onUpdateClick = {
-                    val activity = navController.context as? androidx.activity.ComponentActivity
-                    activity?.let { updateViewModel.startUpdate(it) }
-                },
-                onDismissClick = {
-                    updateViewModel.dismissUpdate()
-                }
-            )
-        }
+        // Note: Google's native in-app update UI is handled automatically by Google Play
+        // If an update is available, Google's popup will appear automatically
+        // No custom UI dialog needed here
     }
 }
