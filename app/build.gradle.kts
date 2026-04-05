@@ -13,11 +13,11 @@ plugins {
 }
 
 android {
-    namespace = "com.anurag.eduapp"
+    namespace = "com.ncert7.mathandsciencelab"
     compileSdk =36
 
     defaultConfig {
-        applicationId = "com.anurag.eduapp"
+        applicationId = "com.ncert7.mathandsciencelab"
         minSdk = 28
         targetSdk = 35
         versionCode = 1

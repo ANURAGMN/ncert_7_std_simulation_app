@@ -20,14 +20,14 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keep class com.anurag.eduapp.data.firebase.** { *; }
--keep class com.anurag.eduapp.data.model.** { *; }
+-keep class com.ncert7.mathandsciencelab.data.firebase.** { *; }
+-keep class com.ncert7.mathandsciencelab.data.model.** { *; }
 
--keep,includedescriptorclasses class com.anurag.eduapp.**$$serializer { *; }
--keepclassmembers class com.anurag.eduapp.** {
+-keep,includedescriptorclasses class com.ncert7.mathandsciencelab.**$$serializer { *; }
+-keepclassmembers class com.ncert7.mathandsciencelab.** {
     *** Companion;
 }
--keepclasseswithmembers class com.anurag.eduapp.** {
+-keepclasseswithmembers class com.ncert7.mathandsciencelab.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
 
@@ -37,5 +37,5 @@
 -keep class com.google.android.gms.auth.** { *; }
 
 # Keep your User model from being obfuscated
--keep class com.anurag.eduapp.data.firebase.model.User { *; }
--keepclassmembers class com.anurag.eduapp.data.firebase.model.User { *; }
+-keep class com.ncert7.mathandsciencelab.data.firebase.model.User { *; }
+-keepclassmembers class com.ncert7.mathandsciencelab.data.firebase.model.User { *; }

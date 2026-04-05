@@ -1,0 +1,88 @@
+package com.ncert7.mathandsciencelab
+
+import android.app.Application
+import androidx.work.BackoffPolicy
+import androidx.work.Configuration
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.ncert7.mathandsciencelab.data.local.SharedPreferenceUtils
+import com.ncert7.mathandsciencelab.debug.DebugLogger
+import com.ncert7.mathandsciencelab.service.analytics.SessionManager
+import com.ncert7.mathandsciencelab.service.sync.WeeklySyncWorker
+import com.ncert7.mathandsciencelab.utils.AppLifecycleObserver
+import com.ncert7.mathandsciencelab.utils.LanguageHelper
+import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
+
+@HiltAndroidApp
+class EduAiApplication : Application(), Configuration.Provider {
+
+    private lateinit var appLifecycleObserver: AppLifecycleObserver
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder()
+            .setMinimumLoggingLevel(android.util.Log.DEBUG)
+            .build()
+
+    override fun onCreate() {
+        super.onCreate()
+        DebugLogger.debugLog("EduAiApplication", "Application onCreate")
+
+        // Initialize language preference from SharedPreferences
+        initializeLanguage()
+
+        // Initialize SessionManager (handles both sessions and analytics)
+        SessionManager.initialize(this)
+
+        // Register app lifecycle observer (this will handle session start/end)
+        appLifecycleObserver = AppLifecycleObserver()
+        appLifecycleObserver.register()
+
+        // Start initial session
+        applicationScope.launch {
+            SessionManager.startSession()
+            DebugLogger.debugLog("EduAiApplication", "AppLifecycleObserver registered and initial session started")
+        }
+
+        scheduleWeeklySync()
+    }
+
+    private fun initializeLanguage() {
+        try {
+            val sharedPref = SharedPreferenceUtils(this)
+            val savedLanguage = sharedPref.getLanguagePreference() ?: "en"
+            LanguageHelper.setLanguage(savedLanguage)
+            DebugLogger.debugLog("EduAiApplication", "Language initialized to: $savedLanguage")
+        } catch (e: Exception) {
+            DebugLogger.debugLog("EduAiApplication", "Error initializing language: ${e.message}")
+        }
+    }
+
+    private fun scheduleWeeklySync() {
+        val request =
+            PeriodicWorkRequestBuilder<WeeklySyncWorker>(
+                1, TimeUnit.DAYS // testing
+            )
+                .setBackoffCriteria(
+                    BackoffPolicy.EXPONENTIAL,
+                    1, // Initial delay
+                    TimeUnit.MINUTES
+                )
+                .build()
+
+        WorkManager.getInstance(this)
+            .enqueueUniquePeriodicWork(
+                "WEEKLY_SYNC_WORK",
+                ExistingPeriodicWorkPolicy.KEEP,
+                request
+            )
+
+        DebugLogger.debugLog("EduAiApplication", "Weekly sync worker scheduled with exponential backoff retry ")
+    }
+}
