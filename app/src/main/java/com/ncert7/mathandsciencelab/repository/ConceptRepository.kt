@@ -4,7 +4,7 @@ import com.ncert7.mathandsciencelab.data.local.dao.ConceptDao
 import com.ncert7.mathandsciencelab.data.local.dao.ProgressDao
 import com.ncert7.mathandsciencelab.data.local.entities.ConceptEntity
 import com.ncert7.mathandsciencelab.data.local.entities.ProgressEntity
-import com.ncert7.mathandsciencelab.utils.RetryHelper
+import com.ncert7.mathandsciencelab.utils.DatabaseRetryHelper
 
 /**
  * Repository class for managing concepts and their progress.
@@ -15,52 +15,44 @@ class ConceptRepository(
 ) {
     /**
      * Retrieves all concepts from the database.
+     * Retries only if there's an actual failure.
      * returns List of ConceptEntity
      */
     suspend fun getAllConcepts(): List<ConceptEntity> {
-        return RetryHelper.executeWithRetryList(
-            maxRetries = 3,
-            functionName = "ConceptDao.getAllConceptsSync"
-        ) {
+        return DatabaseRetryHelper.retryIfFails(maxRetries = 3) {
             conceptDao.getAllConceptsSync()
         }
     }
 
     /**
      * Retrieves a list of concepts for a given chapter.
+     * Retries only if there's an actual failure.
      * returns List of ConceptEntity
      */
     suspend fun getConceptsForChapter(chapterId: String, type: String): List<ConceptEntity> {
-        return RetryHelper.executeWithRetryList(
-            maxRetries = 3,
-            functionName = "ConceptDao.getConceptsForChapterSync($chapterId, $type)"
-        ) {
+        return DatabaseRetryHelper.retryIfFails(maxRetries = 3) {
             conceptDao.getConceptsForChapterSync(chapterId, type)
         }
     }
 
     /**
      * Retrieves a specific concept by its ID.
+     * Retries only if there's an actual failure.
      * returns ConceptEntity or null if not found
      */
     suspend fun getConcept(conceptId: String): ConceptEntity? {
-        return RetryHelper.executeWithRetry(
-            maxRetries = 3,
-            functionName = "ConceptDao.getConcept($conceptId)"
-        ) {
+        return DatabaseRetryHelper.retryIfFailsNullable(maxRetries = 3) {
             conceptDao.getConcept(conceptId)
         }
     }
 
     /**
      * Retrieves the progress of a student for a specific item.
+     * Retries only if there's an actual failure.
      * returns ProgressEntity or null if not found
      */
     suspend fun getProgress(studentId: String, itemType: String, itemId: String): ProgressEntity? {
-        return RetryHelper.executeWithRetry(
-            maxRetries = 3,
-            functionName = "ProgressDao.getProgress($studentId, $itemType, $itemId)"
-        ) {
+        return DatabaseRetryHelper.retryIfFailsNullable(maxRetries = 3) {
             progressDao.getProgress(studentId, itemType, itemId)
         }
     }
@@ -83,10 +75,7 @@ class ConceptRepository(
      * Gets the total number of completed simulations for a student
      */
     suspend fun getTotalCompletedSimulations(studentId: String): Int {
-        return RetryHelper.executeWithRetry(
-            maxRetries = 3,
-            functionName = "ProgressDao.getTotalCompletedSimulations($studentId)"
-        ) {
+        return DatabaseRetryHelper.retryIfFailsNullable(maxRetries = 3) {
             progressDao.getTotalCompletedSimulations(studentId)
         } ?: 0
     }

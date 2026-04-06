@@ -4,9 +4,9 @@ import android.app.Activity
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ncert7.mathandsciencelab.utils.update.GooglePlayUpdateManager
-import com.ncert7.mathandsciencelab.utils.update.UpdateCallback
-import com.ncert7.mathandsciencelab.utils.update.UpdateType
+import com.ncert7.mathandsciencelab.service.update.GooglePlayUpdateManager
+import com.ncert7.mathandsciencelab.service.update.UpdateCallback
+import com.ncert7.mathandsciencelab.service.update.UpdateType
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

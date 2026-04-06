@@ -1,4 +1,4 @@
-package com.ncert7.mathandsciencelab.utils.update
+package com.ncert7.mathandsciencelab.service.update
 
 import android.app.Activity
 import com.google.android.play.core.appupdate.AppUpdateInfo
