@@ -2,6 +2,7 @@ package com.ncert7.mathandsciencelab.repository
 
 import com.ncert7.mathandsciencelab.data.local.dao.ConceptDao
 import com.ncert7.mathandsciencelab.data.local.entities.ConceptEntity
+import com.ncert7.mathandsciencelab.utils.RetryHelper
 
 /**
  * Repository for managing simulation data
@@ -17,7 +18,12 @@ class SimulationRepository(
      * @return List of simulations for the chapter
      */
     suspend fun getSimulationsForChapter(chapterId: String): List<ConceptEntity> {
-        return conceptDao.getConceptsForChapterSync(chapterId = chapterId, type = "SIMULATION")
+        return RetryHelper.executeWithRetryList(
+            maxRetries = 3,
+            functionName = "ConceptDao.getConceptsForChapterSync($chapterId, SIMULATION)"
+        ) {
+            conceptDao.getConceptsForChapterSync(chapterId = chapterId, type = "SIMULATION")
+        }
     }
 
 }

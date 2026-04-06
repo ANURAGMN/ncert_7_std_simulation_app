@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
@@ -18,9 +19,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.ncert7.mathandsciencelab.R
 import com.ncert7.mathandsciencelab.ui.models.SubjectUiModel
 import com.ncert7.mathandsciencelab.ui.theme.CardBackground
@@ -40,6 +44,7 @@ import com.ncert7.mathandsciencelab.ui.theme.TextSecondary
  * @param onClick Lambda function to handle card click events.
  * @param modifier Optional modifier for styling the card.
  */
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun SubjectCard(
     subject: SubjectUiModel,
@@ -72,12 +77,23 @@ fun SubjectCard(
                     ),
                 contentAlignment = Alignment.Center
             ) {
-                // Subject Initial
-                Text(
-                    text=stringResource(R.string.science_emoji),//TODO: Replace with different emoji for each subject
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = TextOnAccent
-                )
+                // Load image from URL or show fallback emoji
+                if (!subject.iconUrl.isNullOrEmpty()) {
+                    GlideImage(
+                        model = subject.iconUrl,
+                        contentDescription = "${subject.name} icon",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(dimens.cornerRadiusMedium)),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Text(
+                        text = stringResource(R.string.science_emoji),
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = TextOnAccent
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(dimens.spaceMedium))

@@ -30,6 +30,7 @@ object SessionManager {
 
     // Thread-safe session ID tracking
     private var currentSessionId: String? = null
+    private var currentStudentId: String? = null
     private val sessionMutex = Mutex()
 
     /**
@@ -62,9 +63,11 @@ object SessionManager {
                 // Create new session
                 val sessionId = UUID.randomUUID().toString()
                 val startTime = System.currentTimeMillis()
+                val studentId = currentStudentId ?: ""
 
                 val session = SessionEntity(
                     sessionId = sessionId,
+                    studentId = studentId,
                     sessionDate = getCurrentDate(),
                     sessionStartTime = startTime,
                     sessionEndTime = null,
@@ -138,12 +141,14 @@ object SessionManager {
     suspend fun trackScreenEntry(screenName: ScreenName) = withContext(Dispatchers.IO) {
         try {
             val sessionId = getCurrentSessionId()
+            val studentId = currentStudentId ?: ""
             if (sessionId == null) {
                 DebugLogger.debugLog("SessionManager", "No session for entry: ${screenName.displayName}")
                 return@withContext
             }
 
             val analytics = AppAnalyticsEntity(
+                studentId = studentId,
                 sessionId = sessionId,
                 screenName = screenName.displayName,
                 eventType = EventType.ENTRY.type,

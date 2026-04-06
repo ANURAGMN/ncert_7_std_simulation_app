@@ -4,6 +4,7 @@ import com.ncert7.mathandsciencelab.data.local.dao.ChapterDao
 import com.ncert7.mathandsciencelab.data.local.dao.ChapterProgressSummary
 import com.ncert7.mathandsciencelab.data.local.dao.ProgressDao
 import com.ncert7.mathandsciencelab.data.local.entities.ChapterEntity
+import com.ncert7.mathandsciencelab.utils.RetryHelper
 
 /**
  * Repository class for managing chapter data and related progress.
@@ -17,7 +18,12 @@ class ChapterRepository(
      * returns List of ChapterEntity
      */
     suspend fun getChaptersForSubject(subjectId: String): List<ChapterEntity> {
-        return chapterDao.getChaptersForSubjectSync(subjectId)
+        return RetryHelper.executeWithRetryList(
+            maxRetries = 3,
+            functionName = "ChapterDao.getChaptersForSubjectSync($subjectId)"
+        ) {
+            chapterDao.getChaptersForSubjectSync(subjectId)
+        }
     }
 
     /**
@@ -25,7 +31,12 @@ class ChapterRepository(
      * returns ChapterEntity or null if not found
      */
     suspend fun getChapter(chapterId: String): ChapterEntity? {
-        return chapterDao.getChapter(chapterId)
+        return RetryHelper.executeWithRetry(
+            maxRetries = 3,
+            functionName = "ChapterDao.getChapter($chapterId)"
+        ) {
+            chapterDao.getChapter(chapterId)
+        }
     }
 
     /**
@@ -37,7 +48,12 @@ class ChapterRepository(
         classLevel: Int,
         subjectId: String
     ): List<ChapterProgressSummary> {
-        return progressDao.getChapterWiseProgress(studentId, classLevel, subjectId)
+        return RetryHelper.executeWithRetryList(
+            maxRetries = 3,
+            functionName = "ProgressDao.getChapterWiseProgress($studentId, $classLevel, $subjectId)"
+        ) {
+            progressDao.getChapterWiseProgress(studentId, classLevel, subjectId)
+        }
     }
 }
 

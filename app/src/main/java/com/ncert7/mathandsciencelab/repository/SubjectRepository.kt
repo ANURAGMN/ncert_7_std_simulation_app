@@ -2,6 +2,7 @@ package com.ncert7.mathandsciencelab.repository
 
 import com.ncert7.mathandsciencelab.data.local.dao.SubjectDao
 import com.ncert7.mathandsciencelab.data.local.entities.SubjectEntity
+import com.ncert7.mathandsciencelab.utils.RetryHelper
 
 /**
  * Repository class for managing subject data.
@@ -14,7 +15,12 @@ class SubjectRepository(
      * returns List of SubjectEntity
      */
     suspend fun getSubjectsForClass(classLevel: Int): List<SubjectEntity> {
-        return subjectDao.getSubjectsForClassSync(classLevel)
+        return RetryHelper.executeWithRetryList(
+            maxRetries = 3,
+            functionName = "SubjectDao.getSubjectsForClassSync($classLevel)"
+        ) {
+            subjectDao.getSubjectsForClassSync(classLevel)
+        }
     }
 
     /**
@@ -22,6 +28,11 @@ class SubjectRepository(
      * returns SubjectEntity or null if not found
      */
     suspend fun getSubject(subjectId: String): SubjectEntity? {
-        return subjectDao.getSubject(subjectId)
+        return RetryHelper.executeWithRetry(
+            maxRetries = 3,
+            functionName = "SubjectDao.getSubject($subjectId)"
+        ) {
+            subjectDao.getSubject(subjectId)
+        }
     }
 }

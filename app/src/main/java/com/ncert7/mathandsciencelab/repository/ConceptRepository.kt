@@ -4,6 +4,7 @@ import com.ncert7.mathandsciencelab.data.local.dao.ConceptDao
 import com.ncert7.mathandsciencelab.data.local.dao.ProgressDao
 import com.ncert7.mathandsciencelab.data.local.entities.ConceptEntity
 import com.ncert7.mathandsciencelab.data.local.entities.ProgressEntity
+import com.ncert7.mathandsciencelab.utils.RetryHelper
 
 /**
  * Repository class for managing concepts and their progress.
@@ -17,7 +18,12 @@ class ConceptRepository(
      * returns List of ConceptEntity
      */
     suspend fun getAllConcepts(): List<ConceptEntity> {
-        return conceptDao.getAllConceptsSync()
+        return RetryHelper.executeWithRetryList(
+            maxRetries = 3,
+            functionName = "ConceptDao.getAllConceptsSync"
+        ) {
+            conceptDao.getAllConceptsSync()
+        }
     }
 
     /**
@@ -25,7 +31,12 @@ class ConceptRepository(
      * returns List of ConceptEntity
      */
     suspend fun getConceptsForChapter(chapterId: String, type: String): List<ConceptEntity> {
-        return conceptDao.getConceptsForChapterSync(chapterId , type )
+        return RetryHelper.executeWithRetryList(
+            maxRetries = 3,
+            functionName = "ConceptDao.getConceptsForChapterSync($chapterId, $type)"
+        ) {
+            conceptDao.getConceptsForChapterSync(chapterId, type)
+        }
     }
 
     /**
@@ -33,7 +44,12 @@ class ConceptRepository(
      * returns ConceptEntity or null if not found
      */
     suspend fun getConcept(conceptId: String): ConceptEntity? {
-        return conceptDao.getConcept(conceptId)
+        return RetryHelper.executeWithRetry(
+            maxRetries = 3,
+            functionName = "ConceptDao.getConcept($conceptId)"
+        ) {
+            conceptDao.getConcept(conceptId)
+        }
     }
 
     /**
@@ -41,7 +57,12 @@ class ConceptRepository(
      * returns ProgressEntity or null if not found
      */
     suspend fun getProgress(studentId: String, itemType: String, itemId: String): ProgressEntity? {
-        return progressDao.getProgress(studentId, itemType, itemId)
+        return RetryHelper.executeWithRetry(
+            maxRetries = 3,
+            functionName = "ProgressDao.getProgress($studentId, $itemType, $itemId)"
+        ) {
+            progressDao.getProgress(studentId, itemType, itemId)
+        }
     }
 
     /**
@@ -55,13 +76,18 @@ class ConceptRepository(
         progressPercentage: Int,
         timestamp: Long
     ) {
-        progressDao.updateProgressStatus(studentId, itemType, itemId, newStatus, progressPercentage,timestamp)
+        progressDao.updateProgressStatus(studentId, itemType, itemId, newStatus, progressPercentage, timestamp)
     }
 
     /**
      * Gets the total number of completed simulations for a student
      */
     suspend fun getTotalCompletedSimulations(studentId: String): Int {
-        return progressDao.getTotalCompletedSimulations(studentId)
+        return RetryHelper.executeWithRetry(
+            maxRetries = 3,
+            functionName = "ProgressDao.getTotalCompletedSimulations($studentId)"
+        ) {
+            progressDao.getTotalCompletedSimulations(studentId)
+        } ?: 0
     }
 }

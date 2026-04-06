@@ -10,12 +10,14 @@ import androidx.room.PrimaryKey
 @Entity(
     tableName = "sessions",
     indices = [
-        Index(value = ["sessionDate"])
+        Index(value = ["sessionDate"]),
+        Index(value = ["studentId"])
     ]
 )
 data class SessionEntity(
     @PrimaryKey
     val sessionId: String,
+    val studentId: String,
     val sessionDate: String, // Format: "yyyy-MM-dd"
     val sessionStartTime: Long,
     val sessionEndTime: Long? = null,
