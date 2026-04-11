@@ -31,6 +31,10 @@ android {
         }
         fun prop(name: String, default: String = ""): String = localProps.getProperty(name, default)
         buildConfigField("String", "AUTH_KEY", "\"${prop("AUTH_KEY")}\"")
+        buildConfigField("String", "ADMOB_APP_ID", "\"${prop("ADMOB_APP_ID")}\"")
+        buildConfigField("String", "BANNER_AD_UNIT_ID", "\"${prop("BANNER_AD_UNIT_ID")}\"")
+        // Manifest placeholders for runtime value substitution
+        manifestPlaceholders["ADMOB_APP_ID"] = prop("ADMOB_APP_ID")
 
     }
 

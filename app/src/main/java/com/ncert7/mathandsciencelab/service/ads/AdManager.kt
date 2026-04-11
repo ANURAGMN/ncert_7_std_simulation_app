@@ -4,26 +4,25 @@ import android.content.Context
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
+import com.ncert7.mathandsciencelab.BuildConfig
 import com.ncert7.mathandsciencelab.debug.DebugLogger
 
 /**
  * AdManager handles Google Mobile Ads banner ad lifecycle and loading.
- * Uses test ad unit ID for development and testing.
+ * Uses ad unit ID from BuildConfig for security.
  */
 class AdManager(private val context: Context) {
     companion object {
-        // Test Ad Unit ID for Banner Ads - Replace with production ID before publishing
-        private const val BANNER_AD_UNIT_ID = "ca-app-pub-3940256099942544/9214589741"
         private const val TAG = "AdManager"
     }
 
     /**
-     * Creates a new AdView with test ad unit ID and adaptive banner size
+     * Creates a new AdView with ad unit ID from BuildConfig and adaptive banner size
      */
     fun createBannerAd(): AdView {
         return try {
             val adView = AdView(context)
-            adView.adUnitId = BANNER_AD_UNIT_ID
+            adView.adUnitId = BuildConfig.BANNER_AD_UNIT_ID
 
             // Set adaptive banner ad size
             val adSize = AdSize.BANNER
