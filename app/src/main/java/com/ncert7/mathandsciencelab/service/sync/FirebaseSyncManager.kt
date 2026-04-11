@@ -3,6 +3,7 @@ package com.ncert7.mathandsciencelab.service.sync
 
 import com.ncert7.mathandsciencelab.data.local.dao.ChapterDao
 import com.ncert7.mathandsciencelab.data.local.dao.ConceptDao
+import com.ncert7.mathandsciencelab.data.local.dao.ProgressDao
 import com.ncert7.mathandsciencelab.data.local.dao.SubjectDao
 import com.ncert7.mathandsciencelab.data.local.entities.ChapterEntity
 import com.ncert7.mathandsciencelab.data.local.entities.ConceptEntity
@@ -12,14 +13,15 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
 /**
- * Handles synchronization of educational content from Firebase Firestore to local Room database.
+ * Handles synchronization of educational content and user progress from Firebase Firestore to local Room database.
  * Uses mapper objects to convert Firestore documents to local entities.
  */
 class FirebaseSyncManager(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
     private val subjectDao: SubjectDao,
     private val chapterDao: ChapterDao,
-    private val conceptDao: ConceptDao
+    private val conceptDao: ConceptDao,
+    private val progressDao: ProgressDao? = null
 ) {
     companion object {
         private const val CONCEPTS_COLLECTION = "Concept"
@@ -184,7 +186,60 @@ class FirebaseSyncManager(
             SyncResult(success = false, message = errorMsg)
         }
     }
+
+    /**
+     * Syncs user's progress from Firestore to local database
+     * Called when an existing user logs in to restore their progress history
+     * Progress is fetched from users/{userId}/progress subcollection
+     */
+    suspend fun syncUserProgress(userId: String): SyncResult {
+        return try {
+            if (progressDao == null) {
+                DebugLogger.debugLog(TAG, "ProgressDao not provided, skipping progress sync")
+                return SyncResult(success = true, message = "Progress sync skipped - ProgressDao not available")
+            }
+
+            DebugLogger.debugLog(TAG, "Starting user progress sync from Firestore for userId: $userId")
+
+            // Progress is stored at: progress/{userId}/records/{itemType}_{itemId}
+            val snapshot = firestore
+                .collection("progress")
+                .document(userId)
+                .collection("records")
+                .get()
+                .await()
+
+            if (snapshot.isEmpty) {
+                DebugLogger.debugLog(TAG, "No progress found for user: $userId")
+                return SyncResult(success = true, message = "No progress data to sync")
+            }
+
+            val progressList = snapshot.documents.mapNotNull { document ->
+                try {
+                    FirebaseProgressMapper.map(document, userId)
+                } catch (e: Exception) {
+                    DebugLogger.errorLog(TAG, "Error mapping progress document ${document.id}: ${e.message}")
+                    null // Skip malformed documents
+                }
+            }
+
+            if (progressList.isNotEmpty()) {
+                // Use REPLACE strategy to overwrite any local progress with Firestore data
+                progressDao.insertProgressList(progressList)
+                DebugLogger.debugLog(TAG, " Synced ${progressList.size} progress entries for user: $userId")
+            }
+
+            val message = "Synced ${progressList.size} progress entries for user $userId"
+            SyncResult(success = true, message = message)
+        } catch (e: Exception) {
+            val errorMsg = "User progress sync failed: ${e.message}"
+            DebugLogger.errorLog(TAG, errorMsg)
+            SyncResult(success = false, message = errorMsg)
+        }
+    }
 }
 
 /** Result of a sync operation */
 data class SyncResult(val success: Boolean, val message: String)
+
+

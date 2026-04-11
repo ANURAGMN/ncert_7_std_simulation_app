@@ -191,10 +191,15 @@ class UserViewModel @Inject constructor(
                 val syncManager = FirebaseSyncManager(
                     subjectDao = db.subjectDao(),
                     chapterDao = db.chapterDao(),
-                    conceptDao = db.conceptDao()
+                    conceptDao = db.conceptDao(),
+                    progressDao = db.progressDao()
                 )
-                val result = syncManager.syncAllContent()
-                DebugLogger.debugLog("UserViewModel", "Content sync: ${result.message}")
+                val contentResult = syncManager.syncAllContent()
+                DebugLogger.debugLog("UserViewModel", "Content sync: ${contentResult.message}")
+
+                // Sync user progress from Firebase
+                val progressResult = syncManager.syncUserProgress(currentUser.id)
+                DebugLogger.debugLog("UserViewModel", "Progress sync: ${progressResult.message}")
 
                 // Save preferences
                 sharedPreference.setLoggedIn(true)
@@ -256,7 +261,8 @@ class UserViewModel @Inject constructor(
                     val syncManager = FirebaseSyncManager(
                         subjectDao = db.subjectDao(),
                         chapterDao = db.chapterDao(),
-                        conceptDao = db.conceptDao()
+                        conceptDao = db.conceptDao(),
+                        progressDao = db.progressDao()
                     )
                     val result = syncManager.syncAllContent()
                     DebugLogger.debugLog("UserViewModel", "Content sync: ${result.message}")
