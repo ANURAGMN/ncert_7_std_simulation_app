@@ -159,6 +159,25 @@ interface ProgressDao {
     )
     suspend fun getTotalCompletedConcepts(studentId: String): Int
 
+    /** Flow-based total completed concepts count - updates in real-time when progress changes */
+    @Query(
+        """
+        SELECT COUNT(*) 
+        FROM progress p
+        INNER JOIN concepts c ON p.itemId = c.conceptId
+        WHERE p.studentId = :studentId 
+        AND p.itemType = 'CONCEPT' 
+        AND p.status = 'COMPLETED'
+        AND c.type = 'SIMULATION'
+        AND (
+            (c.simulationUrl IS NOT NULL AND c.simulationUrl != '' AND c.simulationUrl != 'Not found')
+            OR
+            (c.simulationUrlKannada IS NOT NULL AND c.simulationUrlKannada != '' AND c.simulationUrlKannada != 'Not found')
+        )
+    """
+    )
+    fun getTotalCompletedConceptsFlow(studentId: String): Flow<Int>
+
     /** Get the total number of completed simulations for a student */
     @Query(
         """
@@ -177,6 +196,25 @@ interface ProgressDao {
     """
     )
     suspend fun getTotalCompletedSimulations(studentId: String): Int
+
+    /** Flow-based total completed simulations count - updates in real-time when progress changes */
+    @Query(
+        """
+        SELECT COUNT(*) 
+        FROM progress p
+        INNER JOIN concepts c ON p.itemId = c.conceptId
+        WHERE p.studentId = :studentId 
+        AND p.itemType = 'CONCEPT' 
+        AND p.status = 'COMPLETED'
+        AND c.type = 'SIMULATION'
+        AND (
+            (c.simulationUrl IS NOT NULL AND c.simulationUrl != '' AND c.simulationUrl != 'Not found')
+            OR
+            (c.simulationUrlKannada IS NOT NULL AND c.simulationUrlKannada != '' AND c.simulationUrlKannada != 'Not found')
+        )
+    """
+    )
+    fun getTotalCompletedSimulationsFlow(studentId: String): Flow<Int>
 
     /**
      * Get the number of concepts cleared in the last 7 days, day-wise

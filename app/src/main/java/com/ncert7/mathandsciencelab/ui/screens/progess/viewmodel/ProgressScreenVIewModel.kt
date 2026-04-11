@@ -110,23 +110,27 @@ class ProgressScreenViewModel @Inject constructor(
     init {
         getStudent()
         getStreak()
-        getTotalCompletedConcept()
-        getTotalCompletedSimulations()
+        observeTotalCompletedConcepts()
+        observeTotalCompletedSimulations()
     }
 
     // --- Data Loading Functions ---
 
-    fun getTotalCompletedConcept() {
+    fun observeTotalCompletedConcepts() {
         viewModelScope.launch {
-            val result = progressDao.getTotalCompletedConcepts(userId)
-            _totalCompletedConcept.value = result
+            progressDao.getTotalCompletedConceptsFlow(userId)
+                .collect { result ->
+                    _totalCompletedConcept.value = result
+                }
         }
     }
 
-    fun getTotalCompletedSimulations() {
+    fun observeTotalCompletedSimulations() {
         viewModelScope.launch {
-            val result = progressDao.getTotalCompletedSimulations(userId)
-            _totalCompletedSimulations.value = result
+            progressDao.getTotalCompletedSimulationsFlow(userId)
+                .collect { result ->
+                    _totalCompletedSimulations.value = result
+                }
         }
     }
 
