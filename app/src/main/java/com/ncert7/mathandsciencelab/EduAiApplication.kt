@@ -9,6 +9,7 @@ import androidx.work.WorkManager
 import com.ncert7.mathandsciencelab.data.local.SharedPreferenceUtils
 import com.ncert7.mathandsciencelab.debug.DebugLogger
 import com.ncert7.mathandsciencelab.service.analytics.SessionManager
+import com.ncert7.mathandsciencelab.service.sync.DataSyncService
 import com.ncert7.mathandsciencelab.service.sync.WeeklySyncWorker
 import com.ncert7.mathandsciencelab.utils.AppLifecycleObserver
 import com.ncert7.mathandsciencelab.utils.LanguageHelper
@@ -36,6 +37,9 @@ class EduAiApplication : Application(), Configuration.Provider {
 
         // Initialize language preference from SharedPreferences
         initializeLanguage()
+
+        // Initialize DataSyncService for real-time and offline sync
+        DataSyncService.initialize(this)
 
         // Initialize SessionManager (handles both sessions and analytics)
         SessionManager.initialize(this)
@@ -84,5 +88,21 @@ class EduAiApplication : Application(), Configuration.Provider {
             )
 
         DebugLogger.debugLog("EduAiApplication", "Weekly sync worker scheduled with exponential backoff retry ")
+    }
+
+    /**
+     * Cleanup resources when app is terminated
+     */
+    override fun onTerminate() {
+        super.onTerminate()
+        try {
+            // Shutdown DataSyncService
+            DataSyncService.shutdown()
+            // Unregister app lifecycle observer
+            appLifecycleObserver.unregister()
+            DebugLogger.debugLog("EduAiApplication", " Application terminated and cleaned up")
+        } catch (e: Exception) {
+            DebugLogger.errorLog("EduAiApplication", " Error during cleanup: ${e.message}")
+        }
     }
 }

@@ -6,6 +6,7 @@ import com.ncert7.eduai.data.local.entities.SessionEntity
 import com.ncert7.mathandsciencelab.data.local.EduAiDatabase
 import com.ncert7.mathandsciencelab.data.local.SharedPreferenceUtils
 import com.ncert7.mathandsciencelab.debug.DebugLogger
+import com.ncert7.mathandsciencelab.service.sync.DataSyncService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -83,6 +84,9 @@ object SessionManager {
                 currentSessionId = sessionId
                 sharedPrefs.setCurrentSession(sessionId)
 
+                // Trigger sync
+                DataSyncService.syncSessionUpdate(sessionId)
+
                 DebugLogger.debugLog("SessionManager", "Session started: $sessionId")
             } catch (e: Exception) {
                 DebugLogger.debugLog("SessionManager", "Error starting session: ${e.message}")
@@ -117,6 +121,9 @@ object SessionManager {
                         durationMillis = endTime - session.sessionStartTime
                     )
                     database.sessionDao().updateSession(updatedSession)
+
+                    // Trigger sync
+                    DataSyncService.syncSessionUpdate(sessionId)
 
                     DebugLogger.debugLog(
                         "SessionManager",
@@ -159,6 +166,10 @@ object SessionManager {
             )
 
             database.appAnalyticsDao().insertAnalytics(analytics)
+
+            // Trigger sync for analytics
+            DataSyncService.syncAnalyticsUpdate(analytics.analyticsId)
+
             DebugLogger.debugLog("SessionManager", "Entry: ${screenName.displayName}")
 
         } catch (e: Exception) {
@@ -191,6 +202,9 @@ object SessionManager {
                     exitTime = exitTime,
                     durationMillis = duration
                 )
+
+                // Trigger sync for analytics
+                DataSyncService.syncAnalyticsUpdate(activeAnalytics.analyticsId)
 
                 DebugLogger.debugLog(
                     "SessionManager","Exit: ${screenName.displayName}, Duration: ${duration / 1000}s"

@@ -15,6 +15,7 @@ import com.ncert7.mathandsciencelab.ui.screens.conceptscreen.dataclass.ConceptSc
 import com.ncert7.mathandsciencelab.utils.getLocalizedName
 import com.ncert7.mathandsciencelab.utils.buildProgressUiModel
 import com.ncert7.mathandsciencelab.utils.isKannada
+import com.ncert7.mathandsciencelab.service.sync.DataSyncService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -223,6 +224,13 @@ class ConceptViewModel @Inject constructor(
                         timestamp = currentTime
                     )
                     DebugLogger.debugLog("ConceptViewModel", "✅ Simulation marked as COMPLETED for concept: $conceptId at $currentTime")
+
+                    // Trigger real-time sync to Firestore
+                    // Get the progress ID from the database to sync
+                    val progress = conceptRepository.getProgress(studentId, "CONCEPT", conceptId)
+                    if (progress != null) {
+                        DataSyncService.syncProgressUpdate(progress.progressId, studentId)
+                    }
                 } else {
                     DebugLogger.errorLog("ConceptViewModel", "❌ Failed to mark simulation completed - studentId: $studentId, conceptId: $conceptId")
                 }

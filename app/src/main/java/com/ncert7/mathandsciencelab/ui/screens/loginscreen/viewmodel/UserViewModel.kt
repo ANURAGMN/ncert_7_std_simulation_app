@@ -12,6 +12,7 @@ import com.ncert7.mathandsciencelab.repository.FirebaseRepository
 import com.ncert7.mathandsciencelab.repository.StudentLocalRepository
 import com.ncert7.mathandsciencelab.repository.UserCheckResult
 import com.ncert7.mathandsciencelab.service.sync.FirebaseSyncManager
+import com.ncert7.mathandsciencelab.service.sync.DataSyncService
 import com.ncert7.mathandsciencelab.utils.LanguageHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -200,6 +201,10 @@ class UserViewModel @Inject constructor(
                 sharedPreference.setLanguagePreference(currentUser.language)
                 sharedPreference.setUserId(currentUser.id)
 
+                // Initialize DataSyncService with the student ID for real-time sync
+                DataSyncService.updateStudentId(currentUser.id)
+                DebugLogger.debugLog("UserViewModel", "DataSyncService initialized with studentId: ${currentUser.id}")
+
                 _existingUserSyncState.value = ExistingUserSyncState.Success
             } catch (e: Exception) {
                 DebugLogger.debugLog("UserViewModel", "Error saving user locally: ${e.message}")
@@ -260,6 +265,10 @@ class UserViewModel @Inject constructor(
                     sharedPreference.setLoggedIn(true)
                     sharedPreference.setLanguagePreference(currentUser.language)
                     sharedPreference.setUserId(currentUser.id)
+
+                    // Initialize DataSyncService with the student ID for real-time sync
+                    DataSyncService.updateStudentId(currentUser.id)
+                    DebugLogger.debugLog("UserViewModel", "DataSyncService initialized with studentId: ${currentUser.id}")
 
                     _userSaveState.value = UserSaveState.Success
                 } else {

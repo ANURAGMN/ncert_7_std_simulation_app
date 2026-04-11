@@ -4,6 +4,8 @@ import com.ncert7.mathandsciencelab.data.local.dao.ConceptDao
 import com.ncert7.mathandsciencelab.data.local.dao.ProgressDao
 import com.ncert7.mathandsciencelab.data.local.entities.ConceptEntity
 import com.ncert7.mathandsciencelab.data.local.entities.ProgressEntity
+import com.ncert7.mathandsciencelab.debug.DebugLogger
+import com.ncert7.mathandsciencelab.service.sync.DataSyncService
 import com.ncert7.mathandsciencelab.utils.DatabaseRetryHelper
 
 /**
@@ -69,6 +71,13 @@ class ConceptRepository(
         timestamp: Long
     ) {
         progressDao.updateProgressStatus(studentId, itemType, itemId, newStatus, progressPercentage, timestamp)
+
+        // Get the updated progress and trigger sync
+        val progress = progressDao.getProgress(studentId, itemType, itemId)
+        if (progress != null) {
+            DebugLogger.debugLog("ConceptRepository", "Syncing progress update: ${progress.progressId}")
+            DataSyncService.syncProgressUpdate(progress.progressId, studentId)
+        }
     }
 
     /**

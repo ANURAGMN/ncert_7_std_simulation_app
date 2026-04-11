@@ -12,7 +12,12 @@ class AppLifecycleObserver : DefaultLifecycleObserver {
 
     fun register() {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
-        DebugLogger.debugLog("AppLifecycleObserver", "Registered")
+        DebugLogger.debugLog("AppLifecycleObserver", " Registered")
+    }
+
+    fun unregister() {
+        ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
+        DebugLogger.debugLog("AppLifecycleObserver", " Unregistered")
     }
 
     override fun onStart(owner: LifecycleOwner) {
