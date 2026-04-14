@@ -16,6 +16,7 @@ import com.ncert7.mathandsciencelab.utils.getLocalizedName
 import com.ncert7.mathandsciencelab.utils.buildProgressUiModel
 import com.ncert7.mathandsciencelab.utils.isKannada
 import com.ncert7.mathandsciencelab.service.sync.DataSyncService
+import com.ncert7.mathandsciencelab.utils.StreakManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,7 +34,8 @@ class ConceptViewModel @Inject constructor(
     private val chapterRepository: ChapterRepository,
     private val subjectRepository: SubjectRepository,
     private val studentRepository: StudentLocalRepository,
-    private val sharedPrefs: SharedPreferenceUtils
+    private val sharedPrefs: SharedPreferenceUtils,
+    private val streakManager: StreakManager
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ConceptScreenState())
@@ -223,7 +225,13 @@ class ConceptViewModel @Inject constructor(
                         progressPercentage = 100,
                         timestamp = currentTime
                     )
-                    DebugLogger.debugLog("ConceptViewModel", "✅ Simulation marked as COMPLETED for concept: $conceptId at $currentTime")
+                    DebugLogger.debugLog("ConceptViewModel", " Simulation marked as COMPLETED for concept: $conceptId at $currentTime")
+
+                    // Update user's streak when simulation is completed
+                    DebugLogger.debugLog("ConceptViewModel", "Updating streak on simulation completion")
+                    streakManager.onConceptOpened { newStreak ->
+                        DebugLogger.debugLog("ConceptViewModel", "Streak updated to: $newStreak on simulation completion")
+                    }
 
                     // Trigger real-time sync to Firestore
                     // Get the progress ID from the database to sync
@@ -232,10 +240,10 @@ class ConceptViewModel @Inject constructor(
                         DataSyncService.syncProgressUpdate(progress.progressId, studentId)
                     }
                 } else {
-                    DebugLogger.errorLog("ConceptViewModel", "❌ Failed to mark simulation completed - studentId: $studentId, conceptId: $conceptId")
+                    DebugLogger.errorLog("ConceptViewModel", " Failed to mark simulation completed - studentId: $studentId, conceptId: $conceptId")
                 }
             } catch (e: Exception) {
-                DebugLogger.errorLog("ConceptViewModel", "❌ Error marking simulation completed: ${e.message} | ${e.stackTraceToString()}")
+                DebugLogger.errorLog("ConceptViewModel", " Error marking simulation completed: ${e.message} | ${e.stackTraceToString()}")
             }
         }
     }

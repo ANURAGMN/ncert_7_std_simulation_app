@@ -8,7 +8,7 @@ import com.ncert7.mathandsciencelab.data.local.dao.ConceptDao
 import com.ncert7.mathandsciencelab.data.local.dao.ProgressDao
 import com.ncert7.mathandsciencelab.data.local.dao.StudentDao
 import com.ncert7.mathandsciencelab.data.local.dao.SubjectDao
-import com.ncert7.mathandsciencelab.utils.StreakManager
+import com.ncert7.mathandsciencelab.data.local.dao.StreakDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -61,13 +61,13 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideSharedPreferenceUtils(@ApplicationContext context: Context): SharedPreferenceUtils {
-        return SharedPreferenceUtils(context)
+    fun provideStreakDao(database: EduAiDatabase): StreakDao {
+        return database.streakDao()
     }
 
     @Provides
     @Singleton
-    fun provideStreakManager(@ApplicationContext context: Context): StreakManager {
-        return StreakManager(context)
+    fun provideSharedPreferenceUtils(@ApplicationContext context: Context): SharedPreferenceUtils {
+        return SharedPreferenceUtils(context)
     }
 }

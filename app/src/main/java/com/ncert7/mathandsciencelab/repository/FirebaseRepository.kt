@@ -1,6 +1,7 @@
 package com.ncert7.mathandsciencelab.repository
 
 import com.ncert7.mathandsciencelab.data.firebase.model.User
+import com.ncert7.mathandsciencelab.data.firebase.model.Streak
 import com.ncert7.mathandsciencelab.debug.DebugLogger
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.firestore.FirebaseFirestore
@@ -19,6 +20,7 @@ class FirebaseRepository(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) {
     private val usersCollection = firestore.collection("users")
+    private val streakCollection = firestore.collection("streak")
 
     /**
      * Check if a user exists in Firestore
@@ -185,6 +187,66 @@ class FirebaseRepository(
             }
         }
     }
+
+    // ===== STREAK OPERATIONS =====
+
+    /**
+     * Get user's streak from Firestore
+     */
+    suspend fun getStreak(userId: String): Streak? {
+        return try {
+            if (userId.isBlank()) {
+                DebugLogger.errorLog("FirebaseRepository", "Cannot get streak: User ID is empty")
+                return null
+            }
+
+            val snapshot = streakCollection.document(userId).get().await()
+            if (snapshot.exists()) {
+                val streak = snapshot.toObject(Streak::class.java)
+                DebugLogger.debugLog("FirebaseRepository", "Streak retrieved: $userId - count: ${streak?.streakCount}")
+                streak
+            } else {
+                DebugLogger.debugLog("FirebaseRepository", "No streak found for user: $userId")
+                null
+            }
+        } catch (e: Exception) {
+            DebugLogger.errorLog("FirebaseRepository", "Error getting streak: ${e.message}")
+            null
+        }
+    }
+
+    /**
+     * Create or update user's streak in Firestore
+     */
+    suspend fun updateStreak(userId: String, streakCount: Int, lastStreakDate: Long): Boolean {
+        return try {
+            if (userId.isBlank()) {
+                DebugLogger.errorLog("FirebaseRepository", "Cannot update streak: User ID is empty")
+                return false
+            }
+
+            val streak = Streak(
+                userId = userId,
+                streakCount = streakCount,
+                lastStreakDate = lastStreakDate,
+                updatedAt = System.currentTimeMillis()
+            )
+
+            streakCollection.document(userId).set(streak).await()
+            DebugLogger.debugLog("FirebaseRepository", "Streak updated: $userId - count: $streakCount")
+            true
+        } catch (e: FirebaseNetworkException) {
+            DebugLogger.errorLog("FirebaseRepository", "Network error updating streak: ${e.message}")
+            false
+        } catch (e: FirebaseFirestoreException) {
+            DebugLogger.errorLog("FirebaseRepository", "Firestore error updating streak: ${e.message}")
+            false
+        } catch (e: Exception) {
+            DebugLogger.errorLog("FirebaseRepository", "Error updating streak: ${e.message}")
+            false
+        }
+    }
+
 }
 
 /**

@@ -13,11 +13,13 @@ import com.ncert7.mathandsciencelab.data.local.dao.ProgressDao
 import com.ncert7.mathandsciencelab.data.local.dao.SessionDao
 import com.ncert7.mathandsciencelab.data.local.dao.StudentDao
 import com.ncert7.mathandsciencelab.data.local.dao.SubjectDao
+import com.ncert7.mathandsciencelab.data.local.dao.StreakDao
 import com.ncert7.mathandsciencelab.data.local.entities.ChapterEntity
 import com.ncert7.mathandsciencelab.data.local.entities.ConceptEntity
 import com.ncert7.mathandsciencelab.data.local.entities.ProgressEntity
 import com.ncert7.mathandsciencelab.data.local.entities.StudentEntity
 import com.ncert7.mathandsciencelab.data.local.entities.SubjectEntity
+import com.ncert7.mathandsciencelab.data.local.entities.StreakEntity
 
 /**
  * Main Room Database for EduAi App
@@ -31,8 +33,9 @@ import com.ncert7.mathandsciencelab.data.local.entities.SubjectEntity
         SessionEntity::class,
         AppAnalyticsEntity::class,
         ProgressEntity::class,
+        StreakEntity::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = true
 )
 abstract class EduAiDatabase : RoomDatabase() {
@@ -44,6 +47,7 @@ abstract class EduAiDatabase : RoomDatabase() {
     abstract fun progressDao(): ProgressDao
     abstract fun sessionDao(): SessionDao
     abstract fun appAnalyticsDao(): AppAnalyticsDao
+    abstract fun streakDao(): StreakDao
 
     companion object {
         @Volatile

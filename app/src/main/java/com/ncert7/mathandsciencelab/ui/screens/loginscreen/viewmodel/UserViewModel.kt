@@ -10,6 +10,7 @@ import com.ncert7.mathandsciencelab.data.local.entities.StudentEntity
 import com.ncert7.mathandsciencelab.debug.DebugLogger
 import com.ncert7.mathandsciencelab.repository.FirebaseRepository
 import com.ncert7.mathandsciencelab.repository.StudentLocalRepository
+import com.ncert7.mathandsciencelab.repository.StreakRepository
 import com.ncert7.mathandsciencelab.repository.UserCheckResult
 import com.ncert7.mathandsciencelab.service.sync.FirebaseSyncManager
 import com.ncert7.mathandsciencelab.service.sync.DataSyncService
@@ -25,6 +26,7 @@ import kotlin.text.orEmpty
 @HiltViewModel
 class UserViewModel @Inject constructor(
     private val repo: FirebaseRepository,
+    private val streakRepository: StreakRepository,
     private val sharedPreferenceUtils: SharedPreferenceUtils,
 ) : ViewModel() {
 
@@ -201,6 +203,10 @@ class UserViewModel @Inject constructor(
                 val progressResult = syncManager.syncUserProgress(currentUser.id)
                 DebugLogger.debugLog("UserViewModel", "Progress sync: ${progressResult.message}")
 
+                DebugLogger.debugLog("UserViewModel", "Starting streak sync for existing user")
+                streakRepository.syncStreakOnLogin(currentUser.id)
+                DebugLogger.debugLog("UserViewModel", "Streak sync completed")
+
                 // Save preferences
                 sharedPreference.setLoggedIn(true)
                 sharedPreference.setLanguagePreference(currentUser.language)
@@ -266,6 +272,11 @@ class UserViewModel @Inject constructor(
                     )
                     val result = syncManager.syncAllContent()
                     DebugLogger.debugLog("UserViewModel", "Content sync: ${result.message}")
+
+                    // Create initial streak for new user
+                    DebugLogger.debugLog("UserViewModel", "Creating initial streak for new user")
+                    streakRepository.syncStreakOnLogin(currentUser.id)
+                    DebugLogger.debugLog("UserViewModel", "Initial streak created")
 
                     // Save preferences
                     sharedPreference.setLoggedIn(true)

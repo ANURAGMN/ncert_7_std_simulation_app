@@ -33,7 +33,6 @@ import com.ncert7.mathandsciencelab.ui.screens.conceptscreen.viewmodel.ConceptVi
 import com.ncert7.mathandsciencelab.ui.theme.BackgroundPrimary
 import com.ncert7.mathandsciencelab.ui.theme.LocalDimensions
 import com.ncert7.mathandsciencelab.ui.theme.TextPrimary
-import com.ncert7.mathandsciencelab.utils.StreakManager
 
 /**
  * Composable screen to display concepts of a chapter.
@@ -60,17 +59,9 @@ fun ConceptScreen(
     TrackScreenEvent(screenName = ScreenName.CONCEPT)
 
     val dimens = LocalDimensions.current
-    val context = LocalContext.current
     val state by viewModel.state.collectAsState()
 
-
-    // streak update
-    val streakManager = remember { StreakManager(context) }
-
-    // updating streak on concept opening
-    LaunchedEffect(Unit) {
-        streakManager.onConceptOpened()
-    }
+    // Load concepts and update streak (streak update happens in viewModel)
     LaunchedEffect(chapterId, type) {
         viewModel.loadConcepts(chapterId, type)
     }

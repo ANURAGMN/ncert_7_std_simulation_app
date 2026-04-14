@@ -202,9 +202,10 @@ class HomeViewModel @Inject constructor(
         }
     }
     fun getStreak() {
-        val result = streakManager.getCurrentStreak()
-        _streakCount.value = result
-        DebugLogger.debugLog("HomeViewModel", "Current streak: $result days")
+        streakManager.getCurrentStreak { streak ->
+            _streakCount.value = streak
+            DebugLogger.debugLog("HomeViewModel", "Current streak: $streak days")
+        }
     }
 
     fun getTodayCompletedConcept() {

@@ -12,12 +12,14 @@ import com.ncert7.mathandsciencelab.data.local.dao.SubjectDao
 import com.ncert7.mathandsciencelab.data.local.entities.StudentEntity
 import com.ncert7.mathandsciencelab.data.local.entities.SubjectEntity
 import com.ncert7.mathandsciencelab.debug.DebugLogger
+import com.ncert7.mathandsciencelab.repository.StreakRepository
 import com.ncert7.mathandsciencelab.utils.StreakManager
 import com.ncert7.mathandsciencelab.utils.getLocalizedName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
@@ -48,6 +50,7 @@ class ProgressScreenViewModel @Inject constructor(
     private val subjectDao: SubjectDao,
     private val chapterDao: ChapterDao,
     private val streakManager: StreakManager,
+    private val streakRepository: StreakRepository,
     private val studentDao: StudentDao,
     private val sharedPreferenceUtils: SharedPreferenceUtils
 ) : ViewModel() {
@@ -144,8 +147,11 @@ class ProgressScreenViewModel @Inject constructor(
 
     fun getStreak() {
         viewModelScope.launch {
-            val result = streakManager.getCurrentStreak()
-            _streakCount.value = result
+            streakRepository.getStreakFlow(userId).collectLatest { streak ->
+                val streakCount = streak?.streakCount ?: 0
+                _streakCount.value = streakCount
+                DebugLogger.debugLog("ProgressScreenViewModel", "Streak updated: $streakCount")
+            }
         }
     }
 
