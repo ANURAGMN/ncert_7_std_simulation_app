@@ -88,4 +88,13 @@ class ConceptRepository(
             progressDao.getTotalCompletedSimulations(studentId)
         } ?: 0
     }
+
+    /**
+     * Gets the total number of simulations completed today by a student
+     */
+    suspend fun getTodayCompletedSimulations(studentId: String): Int {
+        return DatabaseRetryHelper.retryIfFailsNullable(maxRetries = 3) {
+            progressDao.getTodayCompletedSimulations(studentId)
+        } ?: 0
+    }
 }

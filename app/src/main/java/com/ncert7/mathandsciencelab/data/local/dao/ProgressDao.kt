@@ -217,6 +217,30 @@ interface ProgressDao {
     fun getTotalCompletedSimulationsFlow(studentId: String): Flow<Int>
 
     /**
+     * Get the total number of simulations completed today
+     * Only counts simulation concepts with valid URLs
+     * Uses local date to determine "today"
+     */
+    @Query(
+        """
+        SELECT COUNT(*) 
+        FROM progress p
+        INNER JOIN concepts c ON p.itemId = c.conceptId
+        WHERE p.studentId = :studentId 
+        AND p.itemType = 'CONCEPT' 
+        AND p.status = 'COMPLETED'
+        AND c.type = 'SIMULATION'
+        AND DATE(p.completedAt / 1000, 'unixepoch', 'localtime') = DATE('now', 'localtime')
+        AND (
+            (c.simulationUrl IS NOT NULL AND c.simulationUrl != '' AND c.simulationUrl != 'Not found')
+            OR
+            (c.simulationUrlKannada IS NOT NULL AND c.simulationUrlKannada != '' AND c.simulationUrlKannada != 'Not found')
+        )
+    """
+    )
+    suspend fun getTodayCompletedSimulations(studentId: String): Int
+
+    /**
      * Get the number of concepts cleared in the last 7 days, day-wise
      * Only counts simulation concepts with valid URLs
      * Returns a list of DailyConceptCount with date and count

@@ -252,15 +252,15 @@ class ConceptViewModel @Inject constructor(
             val studentId = sharedPrefs.getUserId() ?: ""
             if (studentId.isEmpty()) return false
 
-            val totalCompleted = conceptRepository.getTotalCompletedSimulations(studentId)
+            val todayCompleted = conceptRepository.getTodayCompletedSimulations(studentId)
 
-            // Show ad if user has completed 3 or more simulations (4th onwards)
-            // This means: 1st 3 simulations = no ad, 4th onwards = always show ad
-            val shouldShow = totalCompleted >= 3
+            // Show ad if user has completed 5 or more simulations today (6th onwards)
+            // This means: 1st 5 simulations per day = no ad, 6th onwards = always show ad
+            val shouldShow = todayCompleted >= 5
 
             DebugLogger.debugLog(
                 "ConceptViewModel",
-                "shouldShowAdBeforeSimulation: $shouldShow | Total simulations completed: $totalCompleted"
+                "shouldShowAdBeforeSimulation: $shouldShow | Simulations completed today: $todayCompleted"
             )
 
             shouldShow
