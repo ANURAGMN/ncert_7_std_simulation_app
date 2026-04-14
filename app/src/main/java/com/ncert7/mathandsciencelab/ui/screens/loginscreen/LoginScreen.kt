@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -117,8 +118,10 @@ fun LoginScreen(
                     Image(
                         painter = painterResource(id = R.drawable.logo),
                         contentDescription = stringResource(R.string.app_logo_desc),
-                        modifier = Modifier.height(dimens.containerMinHeight - dimens.buttonHeight)
-                    )
+                        modifier = Modifier
+                            .height(dimens.containerMinHeight - dimens.buttonHeight)
+                            .clip(RoundedCornerShape(dimens.cornerRadiusMedium))
+                        )
                 }
 
                 // Language Selector Card
