@@ -11,7 +11,6 @@ plugins {
     alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.kotlin.android)
 }
-
 android {
     namespace = "com.ncert7.mathandsciencelab"
     compileSdk =36
@@ -20,8 +19,8 @@ android {
         applicationId = "com.ncert7.mathandsciencelab"
         minSdk = 28
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 5
+        versionName = "1.0.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -38,14 +37,32 @@ android {
 
     }
 
+    signingConfigs {
+        create("release") {
+            val localProps = Properties().apply {
+                val f = rootProject.file("local.properties")
+                if (f.exists()) load(f.inputStream())
+            }
+            storeFile = file(localProps.getProperty("KEYSTORE_PATH", "keystore.jks"))
+            storePassword = localProps.getProperty("KEYSTORE_PASSWORD")
+            keyAlias = localProps.getProperty("KEY_ALIAS")
+            keyPassword = localProps.getProperty("KEY_PASSWORD")
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
+            isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            ndk {
+                debugSymbolLevel = "FULL"
+            }
         }
     }
     compileOptions {
@@ -59,6 +76,11 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+}
+
+// KSP Configuration for Room Schema Export
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 dependencies {

@@ -16,8 +16,9 @@
 *.apk
 *.ap_
 *.class
+*.aab
 gradle-wrapper.jar
 local.properties
 gradle.properties
 google-services.json
-
+app/schemas/
